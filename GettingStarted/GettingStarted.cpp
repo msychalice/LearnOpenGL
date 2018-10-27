@@ -1,11 +1,23 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
+#include <fstream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <Windows.h>
 
 using namespace std;
+
+//特别需要注意的是传入的shader文件编码格式需要时ASCII 
+void openShaderFile(const char* fileName, string& shader)
+{
+	ifstream in(fileName);
+	stringstream ss;
+	ss << in.rdbuf();
+	shader = ss.str();
+	in.close();
+}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -69,15 +81,9 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	const GLchar* vertexShaderSource = "\
-		#version 330 core\n\
-		layout(location = 0) in vec3 aPos;\n\
-\n\
-		void main()\n\
-		{\n\
-			gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n\
-		}\n\
-		";
+	string sVertexShader;
+	openShaderFile("vertex.shader", sVertexShader);
+	const GLchar* vertexShaderSource = sVertexShader.c_str();
 
 	GLuint vertexShader;
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -93,15 +99,9 @@ int main()
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
 
-	const char* fragmentShaderSource = "\
-		#version 330 core\n\
-		out vec4 FragColor;\n\
-\n\
-		void main()\n\
-		{\n\
-			FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n\
-		}\n\
-		";
+	string sFragmentShader;
+	openShaderFile("fragment.shader", sFragmentShader);
+	const GLchar* fragmentShaderSource = sFragmentShader.c_str();
 
 	unsigned int fragmentShader;
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);

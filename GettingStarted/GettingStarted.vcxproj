@@ -122,6 +122,10 @@
     <ClCompile Include="D:\glfw-3.2.1\deps\glad.c" />
     <ClCompile Include="GettingStarted.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="fragment.shader" />
+    <None Include="vertex.shader" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
