@@ -59,11 +59,11 @@ int main()
 
 
 	GLfloat vertices[] = {
-		-1.0f, -0.5f, 0.0f,
-		-0.5f, 0.5f, 0.0f,
-		0.0f, -0.5f, 0.0f,
-		1.0f, -0.5f, 0.0f,
-		0.5f, 0.5f, 0.0f
+		-1.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+		1.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f
 	};
 	GLuint indices[] = {  // note that we start from 0!
 		2, 1, 0,   // first triangle
@@ -159,11 +159,13 @@ int main()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 		// 4. then set the vertex attributes pointers
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		//glDrawArrays(GL_TRIANGLES, 0, 6);	 //glDrawArrays直接用vbo的数据
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
