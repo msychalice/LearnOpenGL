@@ -119,7 +119,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="D:\glfw-3.2.1\deps\glad.c" />
+    <ClCompile Include="..\glfw-3.2.1\deps\glad.c" />
     <ClCompile Include="GettingStarted.cpp" />
   </ItemGroup>
   <ItemGroup>
