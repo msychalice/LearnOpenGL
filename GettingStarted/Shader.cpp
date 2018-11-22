@@ -15,6 +15,15 @@ void Shader::openFile(const char* fileName, string& shader)
 
 Shader::Shader():m_uId(0) {}
 
+Shader::~Shader()
+{
+	if (m_uId != 0)
+	{
+		glDeleteProgram(m_uId);
+		m_uId = 0;
+	}
+}
+
 bool Shader::load(const GLchar* vertexPath, const GLchar* fragmentPath)
 {
 	// vertex shader
@@ -114,3 +123,4 @@ GLuint Shader::getId()const
 {
 	return m_uId;
 }
+

@@ -9,6 +9,7 @@ class Shader
 {
 public:
 	Shader();
+	~Shader();
 	//reads and builds the shader
 	bool load(const GLchar* vertexPath, const GLchar* fragmentPath);
 	// use/activate the shader

@@ -120,6 +120,9 @@ int main()
 		//glfwSwapBuffers(window);
 	}
 
+	delete shader;
+	shader = NULL;
+
 	glfwTerminate();
 
 	//cout << "hello" << endl;
