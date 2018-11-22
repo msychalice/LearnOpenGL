@@ -109,7 +109,7 @@ int main()
 
 		float timeValue = (float)glfwGetTime();
 		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		int vertexColorLocation = glGetUniformLocation(shader->getId(), "ourColor");
+		int vertexColorLocation = glGetUniformLocation(shader->getId(), "uniformColor");
 		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
 		unsigned int VAO;
