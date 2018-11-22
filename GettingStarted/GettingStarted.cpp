@@ -52,11 +52,12 @@ int main()
 		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f,
 		0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
 		1.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f
+		0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f,
+		0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f
 	};
 	GLuint indices[] = {  // note that we start from 0!
 		2, 1, 0,   // first triangle
-		2, 3, 4    // second triangle
+		5, 3, 4    // second triangle
 	};
 
 	GLuint VBO;
