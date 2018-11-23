@@ -5,6 +5,9 @@
 #include "../Common/Shader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace std;
 
@@ -106,6 +109,11 @@ int main()
 	glUniform1i(glGetUniformLocation(shader->getId(), "ourTexture1"), 0);
 	glUniform1i(glGetUniformLocation(shader->getId(), "ourTexture2"), 1);
 
+	glm::mat4 trans;
+	trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+	glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "transform"), 1, GL_FALSE, glm::value_ptr(trans));
+
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -121,6 +129,7 @@ int main()
 		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 		int vertexColorLocation = glGetUniformLocation(shader->getId(), "uniformColor");
 		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
 
 		unsigned int VAO;
 		glGenVertexArrays(1, &VAO);
