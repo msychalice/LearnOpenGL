@@ -109,10 +109,6 @@ int main()
 	glUniform1i(glGetUniformLocation(shader->getId(), "ourTexture1"), 0);
 	glUniform1i(glGetUniformLocation(shader->getId(), "ourTexture2"), 1);
 
-	glm::mat4 trans;
-	trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-	glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "transform"), 1, GL_FALSE, glm::value_ptr(trans));
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -130,6 +126,10 @@ int main()
 		int vertexColorLocation = glGetUniformLocation(shader->getId(), "uniformColor");
 		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
+		glm::mat4 trans;
+		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "transform"), 1, GL_FALSE, glm::value_ptr(trans));
 
 		unsigned int VAO;
 		glGenVertexArrays(1, &VAO);
