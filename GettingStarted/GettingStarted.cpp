@@ -133,19 +133,19 @@ int main()
 	GLuint texture2;
 	loadImage(texture2, "../Resources/Textures/awesomeface.png", GL_RGBA);
 
-	Shader* shader = new Shader();
-	shader->load("vertex.shader", "fragment.shader");
-	shader->use();
-	glUniform1i(glGetUniformLocation(shader->getId(), "ourTexture1"), 0);
-	glUniform1i(glGetUniformLocation(shader->getId(), "ourTexture2"), 1);
+	Shader shader;
+	shader.load("vertex.shader", "fragment.shader");
+	shader.use();
+	glUniform1i(glGetUniformLocation(shader.getId(), "ourTexture1"), 0);
+	glUniform1i(glGetUniformLocation(shader.getId(), "ourTexture2"), 1);
 
 	glm::mat4 view;
 	// note that we're translating the scene in the reverse direction of where we want to move
 	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(45.0f), (float)screenWidth / screenHeight, 0.1f, 100.0f);
-	glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 
 	glEnable(GL_DEPTH_TEST);
@@ -176,7 +176,7 @@ int main()
 
 		float timeValue = (float)glfwGetTime();
 		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		int vertexColorLocation = glGetUniformLocation(shader->getId(), "uniformColor");
+		int vertexColorLocation = glGetUniformLocation(shader.getId(), "uniformColor");
 		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
 		unsigned int VAO;
@@ -214,7 +214,7 @@ int main()
 			model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f * i;
 			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f) + glm::radians(angle), glm::vec3(0.5f, 1.0f, 0.0f));
-			glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+			glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "model"), 1, GL_FALSE, glm::value_ptr(model));
 
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		}
@@ -228,9 +228,6 @@ int main()
 		//Sleep(100);
 		//glfwSwapBuffers(window);
 	}
-
-	delete shader;
-	shader = NULL;
 
 	glfwTerminate();
 
