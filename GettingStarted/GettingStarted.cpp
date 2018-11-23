@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include "../Common/Shader.h"
 #define STB_IMAGE_IMPLEMENTATION
-#include "../Common/stb_image.h"
+#include <stb_image.h>
 
 using namespace std;
 
@@ -75,16 +75,14 @@ int main()
 
 
 	GLfloat vertices[] = {
-		-1.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f,
-		0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-		1.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f,
-		0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+		0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+		0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f
 	};
 	GLuint indices[] = {  // note that we start from 0!
-		2, 1, 0,   // first triangle
-		5, 3, 4    // second triangle
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
 	};
 
 	GLuint VBO;
