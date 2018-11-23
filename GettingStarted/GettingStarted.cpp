@@ -57,7 +57,10 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+	GLuint screenWidth = 800;
+	GLuint screenHeight = 600;
+
+	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "LearnOpenGL", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -72,7 +75,7 @@ int main()
 		return -1;
 	}
 
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, screenWidth, screenHeight);
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -109,6 +112,17 @@ int main()
 	glUniform1i(glGetUniformLocation(shader->getId(), "ourTexture1"), 0);
 	glUniform1i(glGetUniformLocation(shader->getId(), "ourTexture2"), 1);
 
+	glm::mat4 model;
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 view;
+	// note that we're translating the scene in the reverse direction of where we want to move
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	glm::mat4 projection;
+	projection = glm::perspective(glm::radians(45.0f), (float)screenWidth / screenHeight, 0.1f, 100.0f);
+
+	glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -125,11 +139,6 @@ int main()
 		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 		int vertexColorLocation = glGetUniformLocation(shader->getId(), "uniformColor");
 		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-
-		glm::mat4 trans;
-		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-		trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(glGetUniformLocation(shader->getId(), "transform"), 1, GL_FALSE, glm::value_ptr(trans));
 
 		unsigned int VAO;
 		glGenVertexArrays(1, &VAO);

@@ -8,12 +8,15 @@ out vec3 ourColor; // specify a color output to the fragment shader
 out vec3 posColor;
 out vec2 texCoord;
 
-uniform mat4 transform;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main()
 {
-	gl_Position = transform * vec4(aPos, 1.0); // see how we directly give a vec3 to vec4's constructor
-	ourColor = aColor; // set the output variable to a dark-red color
+	// note that we read the multiplication from right to left
+	gl_Position = projection * view * model * vec4(aPos, 1.0);
+	ourColor = aColor;
 	posColor = aPos;
 	texCoord = aTexCoord;
 }
