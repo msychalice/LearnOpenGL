@@ -139,12 +139,8 @@ int main()
 	glUniform1i(glGetUniformLocation(shader.getId(), "ourTexture1"), 0);
 	glUniform1i(glGetUniformLocation(shader.getId(), "ourTexture2"), 1);
 
-	glm::mat4 view;
-	// note that we're translating the scene in the reverse direction of where we want to move
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(45.0f), (float)screenWidth / screenHeight, 0.1f, 100.0f);
-	glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 
@@ -207,6 +203,13 @@ int main()
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//glDrawArrays(GL_TRIANGLES, 0, 6);	 //glDrawArrays直接用vbo的数据
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		float radius = 10.0f;
+		float camX = sin(glfwGetTime()) * radius;
+		float camZ = cos(glfwGetTime()) * radius;
+		glm::mat4 view;
+		view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+		glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
