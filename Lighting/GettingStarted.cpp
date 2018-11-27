@@ -212,7 +212,8 @@ int main()
 		glm::mat4 view = camera.getLookatMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
 		glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
-		glm::mat4 model = glm::translate(model, lightPos);
+		glm::mat4 model;
+		model = glm::translate(model, lightPos);
 		//model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		//draw container
