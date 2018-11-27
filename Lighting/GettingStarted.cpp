@@ -165,9 +165,8 @@ int main()
 
 	Shader shaderContainer;
 	shaderContainer.load("container.vert", "container.frag");
-	shaderContainer.use();
-	//Shader shaderLight;
-	//shaderLight.load("container.vert", "light.frag");
+	Shader shaderLight;
+	shaderLight.load("container.vert", "light.frag");
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -192,9 +191,11 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//draw container
+		shaderContainer.use();
+
 		unsigned int VAO;
 		glGenVertexArrays(1, &VAO);
-
 
 		// ..:: Initialization code :: ..
 		// 1. bind Vertex Array Object
@@ -211,12 +212,11 @@ int main()
 
 		glm::mat4 view = camera.getLookatMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
-		glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
+		glm::vec3 containerPos(0.0f, 0.0f, 0.0f);
 		glm::mat4 model;
-		model = glm::translate(model, lightPos);
-		//model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		model = glm::translate(model, containerPos);
+		model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
-		//draw container
 		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "objectColor"), 1, glm::value_ptr(objectColor));
 		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "lightColor"), 1, glm::value_ptr(lightColor));
 
@@ -228,18 +228,21 @@ int main()
 
 
 		//draw light 
-		//shaderLight.use();
-		//glUniform3fv(glGetUniformLocation(shaderLight.getId(), "lightColor"), 1, glm::value_ptr(lightColor));
+		shaderLight.use();
+		glUniform3fv(glGetUniformLocation(shaderLight.getId(), "lightColor"), 1, glm::value_ptr(lightColor));
 
-		//glUniformMatrix4fv(glGetUniformLocation(shaderLight.getId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
-		//glUniformMatrix4fv(glGetUniformLocation(shaderLight.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		view = camera.getLookatMatrix();
+		projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
+		glUniformMatrix4fv(glGetUniformLocation(shaderLight.getId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(shaderLight.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-		//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-		//glm::mat4 model = glm::translate(model, lightPos);
-		//model = glm::scale(model, glm::vec3(0.2f));
-		//glUniformMatrix4fv(glGetUniformLocation(shaderLight.getId(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glm::vec3 lightPos(1.2f, 1.0f, -2.0f);
+		glm::mat4 modelLight;
+		modelLight = glm::translate(modelLight, lightPos);
+		modelLight = glm::scale(modelLight, glm::vec3(0.2f));
+		glUniformMatrix4fv(glGetUniformLocation(shaderLight.getId(), "model"), 1, GL_FALSE, glm::value_ptr(modelLight));
 
-		//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 		glBindVertexArray(0);
 
@@ -250,7 +253,12 @@ int main()
 
 		//Sleep(100);
 		//glfwSwapBuffers(window);
+
+		glDeleteVertexArrays(1, &VAO);
 	}
+
+	glDeleteBuffers(1, &EBO);
+	glDeleteBuffers(1, &VBO);
 
 	glfwTerminate();
 
