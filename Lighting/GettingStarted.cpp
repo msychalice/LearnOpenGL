@@ -116,27 +116,35 @@ int main()
 	glfwSetScrollCallback(window, scroll_callback);
 
 	GLfloat vertices[] = {
-	-0.5f, -0.5f, -0.5f,
-	 0.5f, -0.5f, -0.5f,
-	 0.5f,  0.5f, -0.5f,
-	-0.5f,  0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-	-0.5f, -0.5f,  0.5f,
-	 0.5f, -0.5f,  0.5f,
-	 0.5f,  0.5f,  0.5f,
-	-0.5f,  0.5f,  0.5f,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 
-	-0.5f,  0.5f,  0.5f,
-	-0.5f,  0.5f, -0.5f,
-	-0.5f, -0.5f, -0.5f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-	 0.5f,  0.5f,  0.5f,
-	 0.5f, -0.5f, -0.5f,
-	 0.5f, -0.5f,  0.5f,
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-	 0.5f, -0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
 
-	-0.5f,  0.5f,  0.5f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
 	};
 	GLuint indices[] = {  // note that we start from 0!
 		0, 1, 2,
@@ -144,13 +152,13 @@ int main()
 		4, 5, 6,
 		6, 7, 4,
 		8, 9, 10,
-		10, 4, 8,
-		11, 2, 12,
-		12, 13, 11,
-		10, 14, 5,
-		5, 4, 10,
-		3, 2, 11,
-		11, 15, 3
+		10, 11, 8,
+		12, 13, 14,
+		14, 15, 12,
+		16, 17, 18,
+		18, 19, 16,
+		20, 21, 22,
+		22, 23, 20
 	};
 
 	GLuint VBO;
@@ -175,6 +183,8 @@ int main()
 
 	glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 	glm::vec3 objectColor(1.0f, 0.5f, 0.31f);
+	glm::vec3 lightPos(0.8f, 0.8f, 0.5f);
+	glm::vec3 containerPos(-1.0f, 0.0f, -1.0f);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -207,19 +217,23 @@ int main()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 		// 4. then set the vertex attributes pointers
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
 
 		glm::mat4 view = camera.getLookatMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
-		glm::vec3 containerPos(0.0f, 0.0f, 0.0f);
 		glm::mat4 model;
 		model = glm::translate(model, containerPos);
 		model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "objectColor"), 1, glm::value_ptr(objectColor));
 		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "lightColor"), 1, glm::value_ptr(lightColor));
+		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "lightPos"), 1, glm::value_ptr(lightPos));
 
+		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
+		glUniformMatrix3fv(glGetUniformLocation(shaderContainer.getId(), "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
 		glUniformMatrix4fv(glGetUniformLocation(shaderContainer.getId(), "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(shaderContainer.getId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(shaderContainer.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -236,7 +250,6 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(shaderLight.getId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(shaderLight.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-		glm::vec3 lightPos(1.2f, 1.0f, -2.0f);
 		glm::mat4 modelLight;
 		modelLight = glm::translate(modelLight, lightPos);
 		modelLight = glm::scale(modelLight, glm::vec3(0.2f));
