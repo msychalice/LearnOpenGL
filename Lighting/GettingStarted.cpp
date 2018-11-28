@@ -227,12 +227,12 @@ int main()
 		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
 		glm::mat4 model;
 		model = glm::translate(model, containerPos);
-		model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "objectColor"), 1, glm::value_ptr(objectColor));
 		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "lightColor"), 1, glm::value_ptr(lightColor));
 		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "lightPos"), 1, glm::value_ptr(lightPos));
-		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "viewPos"), 1, glm::value_ptr(cameraPos));
+		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "viewPos"), 1, glm::value_ptr(camera.getPos()));
 
 		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
 		glUniformMatrix3fv(glGetUniformLocation(shaderContainer.getId(), "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));

@@ -77,3 +77,7 @@ glm::mat4 Camera::getProjectionMatrix(float screenWidth, float screenHeight)cons
 	return glm::perspective(glm::radians(m_fov), screenWidth / screenHeight, 0.1f, 100.0f);
 }
 
+glm::vec3 Camera::getPos()const
+{
+	return m_pos;
+}
