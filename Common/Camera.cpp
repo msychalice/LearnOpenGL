@@ -5,24 +5,39 @@ Camera::Camera(glm::vec3 pos):
 	m_pos(pos),
 	m_front(glm::vec3(0.0f, 0.0f, -1.0f)),
 	m_up(glm::vec3(0.0f, 1.0f, 0.0f)),
+	m_right(glm::normalize(glm::cross(m_front, m_up))),
 	m_yaw(-90.0f),	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 	m_pitch(0.0f),
 	m_fov(45.0f)
-	{}
+{
+	updateCameraVectors();
+}
 
+void Camera::updateCameraVectors()
+{
+	// Calculate the new Front vector
+	glm::vec3 front;
+	front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+	front.y = sin(glm::radians(m_pitch));
+	front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+	m_front = glm::normalize(front);
+	// Also re-calculate the Right and Up vector
+	m_right = glm::normalize(glm::cross(m_front, glm::vec3(0.0f, 1.0f, 0.0f)));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+	m_up = glm::normalize(glm::cross(m_right, m_front));
+}
 
 void Camera::processKeyboardInput(GLFWwindow *window, float deltaTime)
 {
-	speed = 2.5f * deltaTime;
+	float speed = 2.5f * deltaTime;
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		m_pos += speed * m_front;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		m_pos -= speed * m_front;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		m_pos -= glm::normalize(glm::cross(m_front, m_up)) * speed;
+		m_pos -= m_right * speed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		m_pos += glm::normalize(glm::cross(m_front, m_up)) * speed;
+		m_pos += m_right * speed;
 }
 
 void Camera::processMouseMovement(float xoffset, float yoffset)
@@ -39,11 +54,7 @@ void Camera::processMouseMovement(float xoffset, float yoffset)
 	if (m_pitch < -89.0f)
 		m_pitch = -89.0f;
 
-	glm::vec3 front;
-	front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-	front.y = sin(glm::radians(m_pitch));
-	front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-	m_front = glm::normalize(front);
+	updateCameraVectors();
 }
 
 void Camera::processScrollEvent(float xoffset, float yoffset)

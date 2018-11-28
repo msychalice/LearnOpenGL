@@ -16,11 +16,13 @@ public :
 	glm::mat4 getProjectionMatrix(float screenWidth, float screenHeight)const;
 
 private:
+	void updateCameraVectors(); // Calculates the front vector from the Camera's (updated) Euler Angles
+
 	glm::vec3 m_pos;
 	glm::vec3 m_front;
 	glm::vec3 m_up;
+	glm::vec3 m_right;
 	float m_yaw;
 	float m_pitch;
 	float m_fov;
-	float speed;
 };
