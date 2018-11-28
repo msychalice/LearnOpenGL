@@ -16,7 +16,8 @@ float lastX = 0.0f;
 float lastY = 0.0f;
 bool firstMouse = true;
 
-Camera camera;
+glm::vec3 cameraPos(0.0f, 0.0f, 3.0f);
+Camera camera(cameraPos);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {

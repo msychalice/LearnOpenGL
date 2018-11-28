@@ -1,8 +1,8 @@
 #include "../Common/Camera.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera():
-	m_pos(glm::vec3(0.0f, 0.0f, 3.0f)),
+Camera::Camera(glm::vec3 pos):
+	m_pos(pos),
 	m_front(glm::vec3(0.0f, 0.0f, -1.0f)),
 	m_up(glm::vec3(0.0f, 1.0f, 0.0f)),
 	m_yaw(-90.0f),	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
