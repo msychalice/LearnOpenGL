@@ -232,6 +232,7 @@ int main()
 		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "objectColor"), 1, glm::value_ptr(objectColor));
 		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "lightColor"), 1, glm::value_ptr(lightColor));
 		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "lightPos"), 1, glm::value_ptr(lightPos));
+		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "viewPos"), 1, glm::value_ptr(cameraPos));
 
 		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
 		glUniformMatrix3fv(glGetUniformLocation(shaderContainer.getId(), "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
