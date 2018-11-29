@@ -202,8 +202,8 @@ int main()
 
 	glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 	glm::vec3 objectColor(1.0f, 0.5f, 0.31f);
-	glm::vec3 lightPos(0.8f, 0.8f, 0.5f);
-	glm::vec3 containerPos(-1.0f, 0.5f, -1.0f);
+	glm::vec3 lightPos(0.8f, 0.0f, 3.0f);
+	glm::vec3 containerPos(0.0f, 0.0f, -0.5f);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -211,6 +211,9 @@ int main()
 		float currentFrame = (float)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+
+		lightPos.x = cos(glfwGetTime()) * 3.0f;
+		lightPos.z = sin(glfwGetTime()) * 3.0f;
 
 		// input
 		processInput(window, deltaTime);
