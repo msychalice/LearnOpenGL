@@ -2,13 +2,13 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "../Common/Shader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "../Common/Camera.h"
+#include "../Common/Shader.h"
 
 using namespace std;
 
@@ -87,7 +87,6 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	GLuint screenWidth = 800;
 	GLuint screenHeight = 600;
@@ -200,10 +199,11 @@ int main()
 	float deltaTime = 0.0f;	// Time between current frame and last frame
 	float lastFrame = 0.0f; // Time of last frame
 
-	glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-	glm::vec3 objectColor(1.0f, 0.5f, 0.31f);
-	glm::vec3 lightPos(0.8f, 0.0f, 3.0f);
-	glm::vec3 containerPos(0.0f, 0.0f, -0.5f);
+	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	glm::vec3 lightAmbientColor(0.2f, 0.2f, 0.2f);
+	glm::vec3 lightDiffuseColor(0.5f, 0.5f, 0.5f);
+	glm::vec3 lightSpecularColor(1.0f, 1.0f, 1.0f);
+	glm::vec3 containerPos(0.0f, 0.0f, -1.0f);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -212,15 +212,16 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		lightPos.x = cos((float)glfwGetTime()) * 3.0f;
-		lightPos.z = sin((float)glfwGetTime()) * 3.0f;
+		//lightPos.y = 0.0f;
+		//lightPos.x = cos((float)glfwGetTime()) * 3.0f;
+		//lightPos.z = sin((float)glfwGetTime()) * 3.0f;
 
 		// input
 		processInput(window, deltaTime);
 
 		// rendering commands here
 		//
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//draw container
@@ -231,11 +232,21 @@ int main()
 		glm::mat4 model;
 		model = glm::translate(model, containerPos);
 		//model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-		shaderContainer.setVector3fv("objectColor", objectColor);
-		shaderContainer.setVector3fv("lightColor", lightColor);
+
 		glm::vec3 lightPosInView = glm::vec3(view * glm::vec4(lightPos, 1.0f));
-		shaderContainer.setVector3fv("lightPos", lightPosInView);
-		//shaderContainer.setVector3fv("viewPos", camera.getPos());
+		shaderContainer.setVector3fv("light.position", lightPosInView);
+
+		glm::vec3 lightColor;
+		lightColor.x = sin((float)glfwGetTime() * 2.0f);
+		lightColor.y = sin((float)glfwGetTime() * 0.7f);
+		lightColor.z = sin((float)glfwGetTime() * 1.3f);
+
+		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
+		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+
+		shaderContainer.setVector3fv("light.ambient", ambientColor);
+		shaderContainer.setVector3fv("light.diffuse", diffuseColor);
+		shaderContainer.setVector3fv("light.specular", lightSpecularColor);
 
 		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(view * model)));
 		shaderContainer.setMatrix3fv("normalMatrix", normalMatrix);
@@ -243,12 +254,17 @@ int main()
 		shaderContainer.setMatrix4fv("view", view);
 		shaderContainer.setMatrix4fv("projection", projection);
 
+		shaderContainer.setVector3f("material.ambient", 1.0f, 0.5f, 0.31f);
+		shaderContainer.setVector3f("material.diffuse", 1.0f, 0.5f, 0.31f);
+		shaderContainer.setVector3f("material.specular", 0.5f, 0.5f, 0.5f);
+		shaderContainer.setFloat("material.shininess", 32.0f);
+
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 		//draw light 
 		shaderLight.use();
 
-		shaderLight.setVector3fv("lightColor", lightColor);
+		shaderLight.setVector3fv("lightColor", diffuseColor);
 		shaderLight.setMatrix4fv("view", view);
 		shaderLight.setMatrix4fv("projection", projection);
 		glm::mat4 modelLight;
@@ -259,13 +275,8 @@ int main()
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
-
 		// check and call events and swap the buffers
 		glfwPollEvents();
-
-		//Sleep(100);
-		//glfwSwapBuffers(window);
-
 	}
 
 	glBindVertexArray(0);
@@ -275,7 +286,5 @@ int main()
 
 	glfwTerminate();
 
-	//cout << "hello" << endl;
-	//system("pause");
 	return 0;
 }

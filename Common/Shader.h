@@ -17,9 +17,10 @@ public:
 	bool use();
 	// utility uniform functions
 	void setVector3fv(const GLchar* name, const glm::vec3& vec) const;
-	void setVector3fv(const GLchar* name, float x, float y, float z) const;
+	void setVector3f(const GLchar* name, float x, float y, float z) const;
 	void setMatrix3fv(const GLchar* name, const glm::mat3& mat) const;
 	void setMatrix4fv(const GLchar* name, const glm::mat4& mat) const;
+	void setFloat(const GLchar* name, float f) const;
 	GLuint getId()const;
 
 private:
