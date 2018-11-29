@@ -172,6 +172,24 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+
+	// ..:: Initialization code :: ..
+	// 1. bind Vertex Array Object
+	glBindVertexArray(VAO);
+	// 2. copy our vertices array in a vertex buffer for OpenGL to use
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	// 3. copy our index array in a element buffer for OpenGL to use
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	// 4. then set the vertex attributes pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
 	Shader shaderContainer;
 	shaderContainer.load("container.vert", "container.frag");
 	Shader shaderLight;
@@ -185,7 +203,7 @@ int main()
 	glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 	glm::vec3 objectColor(1.0f, 0.5f, 0.31f);
 	glm::vec3 lightPos(0.8f, 0.8f, 0.5f);
-	glm::vec3 containerPos(-1.0f, 0.0f, -1.0f);
+	glm::vec3 containerPos(-1.0f, 0.5f, -1.0f);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -205,61 +223,36 @@ int main()
 		//draw container
 		shaderContainer.use();
 
-		unsigned int VAO;
-		glGenVertexArrays(1, &VAO);
-
-		// ..:: Initialization code :: ..
-		// 1. bind Vertex Array Object
-		glBindVertexArray(VAO);
-		// 2. copy our vertices array in a vertex buffer for OpenGL to use
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		// 3. copy our index array in a element buffer for OpenGL to use
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-		// 4. then set the vertex attributes pointers
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-
 		glm::mat4 view = camera.getLookatMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
 		glm::mat4 model;
 		model = glm::translate(model, containerPos);
 		//model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
-		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "objectColor"), 1, glm::value_ptr(objectColor));
-		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "lightColor"), 1, glm::value_ptr(lightColor));
-		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "lightPos"), 1, glm::value_ptr(lightPos));
-		glUniform3fv(glGetUniformLocation(shaderContainer.getId(), "viewPos"), 1, glm::value_ptr(camera.getPos()));
+		shaderContainer.setVector3fv("objectColor", objectColor);
+		shaderContainer.setVector3fv("lightColor", lightColor);
+		shaderContainer.setVector3fv("lightPos", lightPos);
+		shaderContainer.setVector3fv("viewPos", camera.getPos());
 
 		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
-		glUniformMatrix3fv(glGetUniformLocation(shaderContainer.getId(), "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
-		glUniformMatrix4fv(glGetUniformLocation(shaderContainer.getId(), "model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(glGetUniformLocation(shaderContainer.getId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(shaderContainer.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		shaderContainer.setMatrix3fv("normalMatrix", normalMatrix);
+		shaderContainer.setMatrix4fv("model", model);
+		shaderContainer.setMatrix4fv("view", view);
+		shaderContainer.setMatrix4fv("projection", projection);
 
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
 
 		//draw light 
 		shaderLight.use();
-		glUniform3fv(glGetUniformLocation(shaderLight.getId(), "lightColor"), 1, glm::value_ptr(lightColor));
 
-		view = camera.getLookatMatrix();
-		projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
-		glUniformMatrix4fv(glGetUniformLocation(shaderLight.getId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(shaderLight.getId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-
+		shaderLight.setVector3fv("lightColor", lightColor);
+		shaderLight.setMatrix4fv("view", view);
+		shaderLight.setMatrix4fv("projection", projection);
 		glm::mat4 modelLight;
 		modelLight = glm::translate(modelLight, lightPos);
 		modelLight = glm::scale(modelLight, glm::vec3(0.2f));
-		glUniformMatrix4fv(glGetUniformLocation(shaderLight.getId(), "model"), 1, GL_FALSE, glm::value_ptr(modelLight));
+		shaderLight.setMatrix4fv("model", modelLight);
 
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
-		glBindVertexArray(0);
 
 		glfwSwapBuffers(window);
 
@@ -269,9 +262,10 @@ int main()
 		//Sleep(100);
 		//glfwSwapBuffers(window);
 
-		glDeleteVertexArrays(1, &VAO);
 	}
 
+	glBindVertexArray(0);
+	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &EBO);
 	glDeleteBuffers(1, &VBO);
 

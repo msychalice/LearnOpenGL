@@ -2,6 +2,7 @@
 
 #include <string>
 #include <glad/glad.h> // include glad to get all the required OpenGL headers
+#include <glm/glm.hpp>
 
 using namespace std;
 
@@ -15,9 +16,10 @@ public:
 	// use/activate the shader
 	bool use();
 	// utility uniform functions
-	void setBool(const string &name, bool value) const;
-	void setInt(const string &name, int value) const;
-	void setFloat(const string &name, float value) const;
+	void setVector3fv(const GLchar* name, const glm::vec3& vec) const;
+	void setVector3fv(const GLchar* name, float x, float y, float z) const;
+	void setMatrix3fv(const GLchar* name, const glm::mat3& mat) const;
+	void setMatrix4fv(const GLchar* name, const glm::mat4& mat) const;
 	GLuint getId()const;
 
 private:

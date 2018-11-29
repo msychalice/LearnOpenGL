@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 //特别需要注意的是传入的shader文件编码格式需要时ASCII 
 void Shader::openFile(const char* fileName, string& shader)
@@ -104,19 +105,21 @@ bool Shader::use()
 	return true;
 }
 
-void Shader::setBool(const string &name, bool value) const
+void Shader::setVector3fv(const GLchar* name, const glm::vec3& vec) const
 {
-
+	glUniform3fv(glGetUniformLocation(m_uId, name), 1, glm::value_ptr(vec));
 }
-
-void Shader::setInt(const string &name, int value) const
+void Shader::setVector3fv(const GLchar* name, float x, float y, float z) const
 {
-
+	glUniform3f(glGetUniformLocation(m_uId, name), x, y, z);
 }
-
-void Shader::setFloat(const string &name, float value) const
+void Shader::setMatrix3fv(const GLchar* name, const glm::mat3& mat) const
 {
-
+	glUniformMatrix3fv(glGetUniformLocation(m_uId, name), 1, GL_FALSE, glm::value_ptr(mat));
+}
+void Shader::setMatrix4fv(const GLchar* name, const glm::mat4& mat) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(m_uId, name), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 GLuint Shader::getId()const
