@@ -212,8 +212,8 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		lightPos.x = cos(glfwGetTime()) * 3.0f;
-		lightPos.z = sin(glfwGetTime()) * 3.0f;
+		lightPos.x = cos((float)glfwGetTime()) * 3.0f;
+		lightPos.z = sin((float)glfwGetTime()) * 3.0f;
 
 		// input
 		processInput(window, deltaTime);
@@ -233,10 +233,11 @@ int main()
 		//model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 		shaderContainer.setVector3fv("objectColor", objectColor);
 		shaderContainer.setVector3fv("lightColor", lightColor);
-		shaderContainer.setVector3fv("lightPos", lightPos);
-		shaderContainer.setVector3fv("viewPos", camera.getPos());
+		glm::vec3 lightPosInView = glm::vec3(view * glm::vec4(lightPos, 1.0f));
+		shaderContainer.setVector3fv("lightPos", lightPosInView);
+		//shaderContainer.setVector3fv("viewPos", camera.getPos());
 
-		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
+		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(view * model)));
 		shaderContainer.setMatrix3fv("normalMatrix", normalMatrix);
 		shaderContainer.setMatrix4fv("model", model);
 		shaderContainer.setMatrix4fv("view", view);
