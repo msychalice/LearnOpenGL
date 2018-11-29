@@ -116,35 +116,35 @@ int main()
 	glfwSetScrollCallback(window, scroll_callback);
 
 	GLfloat vertices[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
 
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
 
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
 
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
 
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
 
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f
 	};
 	GLuint indices[] = {  // note that we start from 0!
 		0, 1, 2,
@@ -184,15 +184,20 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	// 4. then set the vertex attributes pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	Shader shaderContainer;
 	shaderContainer.load("container.vert", "container.frag");
 	Shader shaderLight;
 	shaderLight.load("container.vert", "light.frag");
+
+	GLuint texture1;
+	loadImage(texture1, "../Resources/Textures/container2.png", GL_RGBA);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -227,6 +232,8 @@ int main()
 		//draw container
 		shaderContainer.use();
 
+		glUniform1i(glGetUniformLocation(shaderContainer.getId(), "material.diffuse"), 0);
+
 		glm::mat4 view = camera.getLookatMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
 		glm::mat4 model;
@@ -236,16 +243,16 @@ int main()
 		glm::vec3 lightPosInView = glm::vec3(view * glm::vec4(lightPos, 1.0f));
 		shaderContainer.setVector3fv("light.position", lightPosInView);
 
-		glm::vec3 lightColor;
-		lightColor.x = sin((float)glfwGetTime() * 2.0f);
-		lightColor.y = sin((float)glfwGetTime() * 0.7f);
-		lightColor.z = sin((float)glfwGetTime() * 1.3f);
+		//glm::vec3 lightColor;
+		//lightColor.x = sin((float)glfwGetTime() * 2.0f);
+		//lightColor.y = sin((float)glfwGetTime() * 0.7f);
+		//lightColor.z = sin((float)glfwGetTime() * 1.3f);
 
-		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
-		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+		//glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
+		//glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
 
-		shaderContainer.setVector3fv("light.ambient", ambientColor);
-		shaderContainer.setVector3fv("light.diffuse", diffuseColor);
+		shaderContainer.setVector3fv("light.ambient", lightAmbientColor);
+		shaderContainer.setVector3fv("light.diffuse", lightDiffuseColor);
 		shaderContainer.setVector3fv("light.specular", lightSpecularColor);
 
 		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(view * model)));
@@ -254,17 +261,20 @@ int main()
 		shaderContainer.setMatrix4fv("view", view);
 		shaderContainer.setMatrix4fv("projection", projection);
 
-		shaderContainer.setVector3f("material.ambient", 1.0f, 0.5f, 0.31f);
+		//shaderContainer.setVector3f("material.ambient", 1.0f, 0.5f, 0.31f);
 		shaderContainer.setVector3f("material.diffuse", 1.0f, 0.5f, 0.31f);
 		shaderContainer.setVector3f("material.specular", 0.5f, 0.5f, 0.5f);
 		shaderContainer.setFloat("material.shininess", 32.0f);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture1);
 
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 		//draw light 
 		shaderLight.use();
 
-		shaderLight.setVector3fv("lightColor", diffuseColor);
+		shaderLight.setVector3fv("lightColor", lightDiffuseColor);
 		shaderLight.setMatrix4fv("view", view);
 		shaderLight.setMatrix4fv("projection", projection);
 		glm::mat4 modelLight;
