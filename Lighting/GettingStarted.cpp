@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <sstream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #define STB_IMAGE_IMPLEMENTATION
@@ -206,12 +207,17 @@ int main()
 	float deltaTime = 0.0f;	// Time between current frame and last frame
 	float lastFrame = 0.0f; // Time of last frame
 
-	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-	glm::vec3 lightAmbientColor(0.1f, 0.1f, 0.1f);
-	glm::vec3 lightDiffuseColor(0.8f, 0.8f, 0.8f);
-	glm::vec3 lightSpecularColor(1.0f, 1.0f, 1.0f);
-	glm::vec3 containerPos(0.0f, 0.0f, 0.0f);
+	glm::vec3 dirLightAmbientColor(0.05f, 0.05f, 0.05f);
+	glm::vec3 dirLightDiffuseColor(0.4f, 0.4f, 0.4f);
+	glm::vec3 dirLightSpecularColor(0.5f, 0.5f, 0.5f);
+	glm::vec3 pointLightAmbientColor(0.05f, 0.05f, 0.05f);
+	glm::vec3 pointLightDiffuseColor(0.8f, 0.8f, 0.8f);
+	glm::vec3 pointLightSpecularColor(1.0f, 1.0f, 1.0f);
+	glm::vec3 spotLightAmbientColor(0.0f, 0.0f, 0.0f);
+	glm::vec3 spotLightDiffuseColor(1.0f, 1.0f, 1.0f);
+	glm::vec3 spotLightSpecularColor(1.0f, 1.0f, 1.0f);
 
+	glm::vec3 containerPos(0.0f, 0.0f, 0.0f);
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
 		glm::vec3(2.0f,  5.0f, -15.0f),
@@ -224,6 +230,15 @@ int main()
 		glm::vec3(1.5f,  0.2f, -1.5f),
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
+
+	glm::vec3 dirLightPos(0.2f, 1.0f, 0.3f);
+	glm::vec3 pointLightPositions[] = {
+		glm::vec3(0.7f,  0.2f,  2.0f),
+		glm::vec3(2.3f, -3.3f, -4.0f),
+		glm::vec3(-4.0f,  2.0f, -12.0f),
+		glm::vec3(0.0f,  0.0f, -3.0f)
+	};
+	int pointLightNum = sizeof(pointLightPositions) / sizeof(pointLightPositions[0]);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -256,10 +271,11 @@ int main()
 		//方向是从灯的坐标指向原点, 因为平行光在进行坐标系转换时只需要考虑方向, 不需要考虑位置, 所以w变量设为0
 		//glm::vec3 lightDirInView = glm::vec3(view * glm::vec4(glm::vec3(0.0f) - lightPos, 0.0f));	
 		//shaderContainer.setVector3fv("light.direction", lightDirInView);
-		shaderContainer.setVector3fv("light.position", glm::vec3(view * glm::vec4(camera.getPos(), 1.0f)));
-		shaderContainer.setVector3fv("light.direction", glm::vec3(view * glm::vec4(camera.getFront(), 0.0f)));
-		shaderContainer.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-		shaderContainer.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+		shaderContainer.setVector3fv("dirLight.direction", glm::vec3(view * glm::vec4(glm::vec3(0.0f) - dirLightPos, 0.0f)));
+		shaderContainer.setVector3fv("dirLight.ambient", dirLightAmbientColor);
+		shaderContainer.setVector3fv("dirLight.diffuse", dirLightDiffuseColor);
+		shaderContainer.setVector3fv("dirLight.specular", dirLightSpecularColor);
+
 
 		//灯光变色
 		//glm::vec3 lightColor;
@@ -269,12 +285,41 @@ int main()
 		//glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
 		//glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
 
-		shaderContainer.setVector3fv("light.ambient", lightAmbientColor);
-		shaderContainer.setVector3fv("light.diffuse", lightDiffuseColor);
-		shaderContainer.setVector3fv("light.specular", lightSpecularColor);
-		shaderContainer.setFloat("light.constant", 1.0f);
-		shaderContainer.setFloat("light.linear", 0.09f);
-		shaderContainer.setFloat("light.quadratic", 0.032f);
+		for (int i = 0; i < pointLightNum; i++)
+		{
+			ostringstream osm;
+			osm << "pointLights[" << i << "].position";
+			shaderContainer.setVector3fv(osm.str().c_str(), glm::vec3(view * glm::vec4(pointLightPositions[i], 1.0f)));
+			osm.str("");
+			osm << "pointLights[" << i << "].ambient";
+			shaderContainer.setVector3fv(osm.str().c_str(), pointLightAmbientColor);
+			osm.str("");
+			osm << "pointLights[" << i << "].diffuse";
+			shaderContainer.setVector3fv(osm.str().c_str(), pointLightDiffuseColor);
+			osm.str("");
+			osm << "pointLights[" << i << "].specular";
+			shaderContainer.setVector3fv(osm.str().c_str(), pointLightSpecularColor);
+			osm.str("");
+			osm << "pointLights[" << i << "].constant";
+			shaderContainer.setFloat(osm.str().c_str(), 1.0f);
+			osm.str("");
+			osm << "pointLights[" << i << "].linear";
+			shaderContainer.setFloat(osm.str().c_str(), 0.09f);
+			osm.str("");
+			osm << "pointLights[" << i << "].quadratic";
+			shaderContainer.setFloat(osm.str().c_str(), 0.032f);
+		}
+
+		shaderContainer.setVector3fv("spotLight.position", glm::vec3(view * glm::vec4(camera.getPos(), 1.0f)));
+		shaderContainer.setVector3fv("spotLight.direction", glm::vec3(view * glm::vec4(camera.getFront(), 0.0f)));
+		shaderContainer.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+		shaderContainer.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+		shaderContainer.setVector3fv("spotLight.ambient", spotLightAmbientColor);
+		shaderContainer.setVector3fv("spotLight.diffuse", spotLightDiffuseColor);
+		shaderContainer.setVector3fv("spotLight.specular", spotLightSpecularColor);
+		shaderContainer.setFloat("spotLight.constant", 1.0f);
+		shaderContainer.setFloat("spotLight.linear", 0.09f);
+		shaderContainer.setFloat("spotLight.quadratic", 0.032f);
 
 		shaderContainer.setInt("material.diffuse", 0);
 		shaderContainer.setInt("material.specular", 1);
@@ -294,7 +339,6 @@ int main()
 			shaderContainer.setMatrix4fv("model", model);
 			glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(view * model)));
 			shaderContainer.setMatrix3fv("normalMatrix", normalMatrix);
-
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		}
 
@@ -302,15 +346,25 @@ int main()
 		//draw light 
 		shaderLight.use();
 
-		shaderLight.setVector3fv("lightColor", lightDiffuseColor);
+		shaderLight.setVector3fv("lightColor", dirLightDiffuseColor);
 		shaderLight.setMatrix4fv("view", view);
 		shaderLight.setMatrix4fv("projection", projection);
-		glm::mat4 modelLight;
-		modelLight = glm::translate(modelLight, lightPos);
-		modelLight = glm::scale(modelLight, glm::vec3(0.2f));
-		shaderLight.setMatrix4fv("model", modelLight);
 
+		glm::mat4 modelLight;
+		modelLight = glm::translate(modelLight, dirLightPos);
+		modelLight = glm::scale(modelLight, glm::vec3(0.1f));
+		shaderLight.setMatrix4fv("model", modelLight);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+		shaderLight.setVector3fv("lightColor", pointLightDiffuseColor);
+		for (int i = 0; i <= pointLightNum; i++)
+		{
+			glm::mat4 modelPointLight;
+			modelPointLight = glm::translate(modelPointLight, pointLightPositions[i]);
+			modelPointLight = glm::scale(modelPointLight, glm::vec3(0.2f));
+			shaderLight.setMatrix4fv("model", modelPointLight);
+			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		}
 
 		glfwSwapBuffers(window);
 		// check and call events and swap the buffers
