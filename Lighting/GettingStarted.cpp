@@ -55,14 +55,14 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	camera.processScrollEvent((float)xoffset, (float)yoffset);
 }
 
-bool loadImage(GLuint& texture, const char * fileName, GLenum format)
+bool loadImage(GLuint& texture, const char * fileName)
 {
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	// set the texture wrapping/filtering options (on the currently bound texture object)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate the texture
 	int width, height, nrChannels;
@@ -70,12 +70,21 @@ bool loadImage(GLuint& texture, const char * fileName, GLenum format)
 	GLubyte *data = stbi_load(fileName, &width, &height, &nrChannels, 0);
 	if (data)
 	{
+		GLenum format;
+		if (nrChannels == 1)
+			format = GL_RED;
+		else if (nrChannels == 3)
+			format = GL_RGB;
+		else if (nrChannels == 4)
+			format = GL_RGBA;
+
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 	{
 		std::cout << "Failed to load texture" << std::endl;
+		stbi_image_free(data);
 		return false;
 	}
 	stbi_image_free(data);
@@ -198,9 +207,9 @@ int main()
 	shaderLight.load("container.vert", "light.frag");
 
 	GLuint diffuseMap;
-	loadImage(diffuseMap, "../Resources/Textures/container2.png", GL_RGBA);
+	loadImage(diffuseMap, "../Resources/Textures/container2.png");
 	GLuint specularMap;
-	loadImage(specularMap, "../Resources/Textures/container2_specular.png", GL_RGBA);
+	loadImage(specularMap, "../Resources/Textures/container2_specular.png");
 
 	glEnable(GL_DEPTH_TEST);
 
