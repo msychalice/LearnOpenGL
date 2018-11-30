@@ -232,6 +232,7 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		//移动灯光
 		//lightPos.y = 0.0f;
 		//lightPos.x = cos((float)glfwGetTime()) * 3.0f;
 		//lightPos.z = sin((float)glfwGetTime()) * 3.0f;
@@ -253,9 +254,11 @@ int main()
 		shaderContainer.setMatrix4fv("projection", projection);
 
 		//方向是从灯的坐标指向原点, 因为平行光在进行坐标系转换时只需要考虑方向, 不需要考虑位置, 所以w变量设为0
-		glm::vec3 lightDirInView = glm::vec3(view * glm::vec4(glm::vec3(0.0f) - lightPos, 0.0f));	
-		shaderContainer.setVector3fv("light.direction", lightDirInView);
+		//glm::vec3 lightDirInView = glm::vec3(view * glm::vec4(glm::vec3(0.0f) - lightPos, 0.0f));	
+		//shaderContainer.setVector3fv("light.direction", lightDirInView);
+		shaderContainer.setVector3fv("light.position", glm::vec3(view * glm::vec4(lightPos, 1.0f)));
 
+		//灯光变色
 		//glm::vec3 lightColor;
 		//lightColor.x = sin((float)glfwGetTime() * 2.0f);
 		//lightColor.y = sin((float)glfwGetTime() * 0.7f);
@@ -266,10 +269,10 @@ int main()
 		shaderContainer.setVector3fv("light.ambient", lightAmbientColor);
 		shaderContainer.setVector3fv("light.diffuse", lightDiffuseColor);
 		shaderContainer.setVector3fv("light.specular", lightSpecularColor);
+		shaderContainer.setFloat("light.constant", 1.0f);
+		shaderContainer.setFloat("light.linear", 0.09f);
+		shaderContainer.setFloat("light.quadratic", 0.032f);
 
-		//shaderContainer.setVector3f("material.ambient", 1.0f, 0.5f, 0.31f);
-		//shaderContainer.setVector3f("material.diffuse", 1.0f, 0.5f, 0.31f);
-		//shaderContainer.setVector3f("material.specular", 0.5f, 0.5f, 0.5f);
 		shaderContainer.setInt("material.diffuse", 0);
 		shaderContainer.setInt("material.specular", 1);
 		shaderContainer.setFloat("material.shininess", 64.0f);
