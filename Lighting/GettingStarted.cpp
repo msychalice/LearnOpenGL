@@ -196,8 +196,10 @@ int main()
 	Shader shaderLight;
 	shaderLight.load("container.vert", "light.frag");
 
-	GLuint texture1;
-	loadImage(texture1, "../Resources/Textures/container2.png", GL_RGBA);
+	GLuint diffuseMap;
+	loadImage(diffuseMap, "../Resources/Textures/container2.png", GL_RGBA);
+	GLuint specularMap;
+	loadImage(specularMap, "../Resources/Textures/container2_specular.png", GL_RGBA);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -208,7 +210,7 @@ int main()
 	glm::vec3 lightAmbientColor(0.2f, 0.2f, 0.2f);
 	glm::vec3 lightDiffuseColor(0.5f, 0.5f, 0.5f);
 	glm::vec3 lightSpecularColor(1.0f, 1.0f, 1.0f);
-	glm::vec3 containerPos(0.0f, 0.0f, -1.0f);
+	glm::vec3 containerPos(0.0f, 0.0f, 0.0f);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -232,7 +234,6 @@ int main()
 		//draw container
 		shaderContainer.use();
 
-		glUniform1i(glGetUniformLocation(shaderContainer.getId(), "material.diffuse"), 0);
 
 		glm::mat4 view = camera.getLookatMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
@@ -247,7 +248,6 @@ int main()
 		//lightColor.x = sin((float)glfwGetTime() * 2.0f);
 		//lightColor.y = sin((float)glfwGetTime() * 0.7f);
 		//lightColor.z = sin((float)glfwGetTime() * 1.3f);
-
 		//glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
 		//glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
 
@@ -262,12 +262,16 @@ int main()
 		shaderContainer.setMatrix4fv("projection", projection);
 
 		//shaderContainer.setVector3f("material.ambient", 1.0f, 0.5f, 0.31f);
-		shaderContainer.setVector3f("material.diffuse", 1.0f, 0.5f, 0.31f);
-		shaderContainer.setVector3f("material.specular", 0.5f, 0.5f, 0.5f);
-		shaderContainer.setFloat("material.shininess", 32.0f);
+		//shaderContainer.setVector3f("material.diffuse", 1.0f, 0.5f, 0.31f);
+		//shaderContainer.setVector3f("material.specular", 0.5f, 0.5f, 0.5f);
+		shaderContainer.setInt("material.diffuse", 0);
+		shaderContainer.setInt("material.specular", 1);
+		shaderContainer.setFloat("material.shininess", 64.0f);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
+		glBindTexture(GL_TEXTURE_2D, diffuseMap);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specularMap);
 
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 

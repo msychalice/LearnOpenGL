@@ -21,6 +21,7 @@ public:
 	void setMatrix3fv(const GLchar* name, const glm::mat3& mat) const;
 	void setMatrix4fv(const GLchar* name, const glm::mat4& mat) const;
 	void setFloat(const GLchar* name, float f) const;
+	void setInt(const GLchar* name, int i) const;
 	GLuint getId()const;
 
 private:

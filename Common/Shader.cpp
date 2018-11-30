@@ -121,10 +121,13 @@ void Shader::setMatrix4fv(const GLchar* name, const glm::mat4& mat) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(m_uId, name), 1, GL_FALSE, glm::value_ptr(mat));
 }
-
 void Shader::setFloat(const GLchar* name, float f) const
 {
 	glUniform1f(glGetUniformLocation(m_uId, name), f);
+}
+void Shader::setInt(const GLchar* name, int i) const
+{
+	glUniform1i(glGetUniformLocation(m_uId, name), i);
 }
 
 GLuint Shader::getId()const
