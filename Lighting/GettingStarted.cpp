@@ -212,6 +212,19 @@ int main()
 	glm::vec3 lightSpecularColor(1.0f, 1.0f, 1.0f);
 	glm::vec3 containerPos(0.0f, 0.0f, 0.0f);
 
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -234,15 +247,14 @@ int main()
 		//draw container
 		shaderContainer.use();
 
-
 		glm::mat4 view = camera.getLookatMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
-		glm::mat4 model;
-		model = glm::translate(model, containerPos);
-		//model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		shaderContainer.setMatrix4fv("view", view);
+		shaderContainer.setMatrix4fv("projection", projection);
 
-		glm::vec3 lightPosInView = glm::vec3(view * glm::vec4(lightPos, 1.0f));
-		shaderContainer.setVector3fv("light.position", lightPosInView);
+		//方向是从灯的坐标指向原点, 因为平行光在进行坐标系转换时只需要考虑方向, 不需要考虑位置, 所以w变量设为0
+		glm::vec3 lightDirInView = glm::vec3(view * glm::vec4(glm::vec3(0.0f) - lightPos, 0.0f));	
+		shaderContainer.setVector3fv("light.direction", lightDirInView);
 
 		//glm::vec3 lightColor;
 		//lightColor.x = sin((float)glfwGetTime() * 2.0f);
@@ -254,12 +266,6 @@ int main()
 		shaderContainer.setVector3fv("light.ambient", lightAmbientColor);
 		shaderContainer.setVector3fv("light.diffuse", lightDiffuseColor);
 		shaderContainer.setVector3fv("light.specular", lightSpecularColor);
-
-		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(view * model)));
-		shaderContainer.setMatrix3fv("normalMatrix", normalMatrix);
-		shaderContainer.setMatrix4fv("model", model);
-		shaderContainer.setMatrix4fv("view", view);
-		shaderContainer.setMatrix4fv("projection", projection);
 
 		//shaderContainer.setVector3f("material.ambient", 1.0f, 0.5f, 0.31f);
 		//shaderContainer.setVector3f("material.diffuse", 1.0f, 0.5f, 0.31f);
@@ -273,7 +279,19 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		for (unsigned int i = 0; i < 10; i++)
+		{
+			glm::mat4 model;
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			shaderContainer.setMatrix4fv("model", model);
+			glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(view * model)));
+			shaderContainer.setMatrix3fv("normalMatrix", normalMatrix);
+
+			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		}
+
 
 		//draw light 
 		shaderLight.use();
