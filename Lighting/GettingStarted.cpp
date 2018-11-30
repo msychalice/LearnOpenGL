@@ -207,8 +207,8 @@ int main()
 	float lastFrame = 0.0f; // Time of last frame
 
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-	glm::vec3 lightAmbientColor(0.2f, 0.2f, 0.2f);
-	glm::vec3 lightDiffuseColor(0.5f, 0.5f, 0.5f);
+	glm::vec3 lightAmbientColor(0.1f, 0.1f, 0.1f);
+	glm::vec3 lightDiffuseColor(0.8f, 0.8f, 0.8f);
 	glm::vec3 lightSpecularColor(1.0f, 1.0f, 1.0f);
 	glm::vec3 containerPos(0.0f, 0.0f, 0.0f);
 
@@ -256,7 +256,9 @@ int main()
 		//方向是从灯的坐标指向原点, 因为平行光在进行坐标系转换时只需要考虑方向, 不需要考虑位置, 所以w变量设为0
 		//glm::vec3 lightDirInView = glm::vec3(view * glm::vec4(glm::vec3(0.0f) - lightPos, 0.0f));	
 		//shaderContainer.setVector3fv("light.direction", lightDirInView);
-		shaderContainer.setVector3fv("light.position", glm::vec3(view * glm::vec4(lightPos, 1.0f)));
+		shaderContainer.setVector3fv("light.position", glm::vec3(view * glm::vec4(camera.getPos(), 1.0f)));
+		shaderContainer.setVector3fv("light.direction", glm::vec3(view * glm::vec4(camera.getFront(), 0.0f)));
+		shaderContainer.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
 
 		//灯光变色
 		//glm::vec3 lightColor;
@@ -275,7 +277,7 @@ int main()
 
 		shaderContainer.setInt("material.diffuse", 0);
 		shaderContainer.setInt("material.specular", 1);
-		shaderContainer.setFloat("material.shininess", 64.0f);
+		shaderContainer.setFloat("material.shininess", 32.0f);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
