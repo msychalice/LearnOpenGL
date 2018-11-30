@@ -259,6 +259,7 @@ int main()
 		shaderContainer.setVector3fv("light.position", glm::vec3(view * glm::vec4(camera.getPos(), 1.0f)));
 		shaderContainer.setVector3fv("light.direction", glm::vec3(view * glm::vec4(camera.getFront(), 0.0f)));
 		shaderContainer.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+		shaderContainer.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
 
 		//µÆ¹â±äÉ«
 		//glm::vec3 lightColor;
