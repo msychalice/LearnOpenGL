@@ -2,13 +2,13 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "../Common/Shader.h"
+#include "../../Common/Shader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "../Common/Camera.h"
+#include "../../Common/Camera.h"
 
 using namespace std;
 
@@ -165,9 +165,9 @@ int main()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	GLuint texture1;
-	loadImage(texture1, "../Resources/Textures/container.jpg", GL_RGB);
+	loadImage(texture1, "../../Resources/Textures/container.jpg", GL_RGB);
 	GLuint texture2;
-	loadImage(texture2, "../Resources/Textures/awesomeface.png", GL_RGBA);
+	loadImage(texture2, "../../Resources/Textures/awesomeface.png", GL_RGBA);
 
 	Shader shader;
 	shader.load("vertex.shader", "fragment.shader");

@@ -124,14 +124,14 @@
     <None Include="light.frag" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Common\Camera.cpp" />
-    <ClCompile Include="..\Common\Shader.cpp" />
-    <ClCompile Include="..\glfw-3.2.1\deps\glad.c" />
+    <ClCompile Include="..\..\Common\Camera.cpp" />
+    <ClCompile Include="..\..\Common\Shader.cpp" />
+    <ClCompile Include="..\..\glfw-3.2.1\deps\glad.c" />
     <ClCompile Include="GettingStarted.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\Camera.h" />
-    <ClInclude Include="..\Common\Shader.h" />
+    <ClInclude Include="..\..\Common\Camera.h" />
+    <ClInclude Include="..\..\Common\Shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

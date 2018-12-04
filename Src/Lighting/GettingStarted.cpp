@@ -8,8 +8,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "../Common/Camera.h"
-#include "../Common/Shader.h"
+#include "../../Common/Camera.h"
+#include "../../Common/Shader.h"
 
 using namespace std;
 
@@ -207,9 +207,9 @@ int main()
 	shaderLight.load("container.vert", "light.frag");
 
 	GLuint diffuseMap;
-	loadImage(diffuseMap, "../Resources/Textures/container2.png");
+	loadImage(diffuseMap, "../../Resources/Textures/container2.png");
 	GLuint specularMap;
-	loadImage(specularMap, "../Resources/Textures/container2_specular.png");
+	loadImage(specularMap, "../../Resources/Textures/container2_specular.png");
 
 	glEnable(GL_DEPTH_TEST);
 

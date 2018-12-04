@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GettingStarted", "GettingStarted\GettingStarted.vcxproj", "{9357FAF0-48FE-4EF4-B151-3F4723FAA3D1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GettingStarted", "Src\GettingStarted\GettingStarted.vcxproj", "{9357FAF0-48FE-4EF4-B151-3F4723FAA3D1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lighting", "Lighting\Lighting.vcxproj", "{6A99F57C-1E52-465B-8474-35F0CD9727C2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lighting", "Src\Lighting\Lighting.vcxproj", "{6A99F57C-1E52-465B-8474-35F0CD9727C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
