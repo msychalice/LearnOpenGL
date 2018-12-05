@@ -131,6 +131,7 @@
   <ItemGroup>
     <None Include="container.frag" />
     <None Include="container.vert" />
+    <None Include="singleColor.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
