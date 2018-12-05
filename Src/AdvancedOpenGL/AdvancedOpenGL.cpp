@@ -258,6 +258,7 @@ int main()
 		//
 
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_STENCIL_TEST);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
