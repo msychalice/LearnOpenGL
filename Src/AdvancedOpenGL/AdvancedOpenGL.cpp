@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #define STB_IMAGE_IMPLEMENTATION
@@ -66,7 +67,7 @@ bool loadImage(GLuint& texture, const char * fileName)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate the texture
 	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true);	// should be called before stbi_load
+	//stbi_set_flip_vertically_on_load(true);	// should be called before stbi_load
 	GLubyte *data = stbi_load(fileName, &width, &height, &nrChannels, 0);
 	if (data)
 	{
@@ -78,7 +79,7 @@ bool loadImage(GLuint& texture, const char * fileName)
 		else if (nrChannels == 4)
 			format = GL_RGBA;
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
@@ -183,6 +184,25 @@ int main()
 		0, 2, 3 
 	};
 
+	float transparentVertices[] = {
+		// positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+		0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+		0.0f, -0.5f,  0.0f,  0.0f,  1.0f,
+		1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+		1.0f,  0.5f,  0.0f,  1.0f,  0.0f
+	};
+	GLuint transparentIndices[] = {  // note that we start from 0!
+		0, 1, 2,
+		0, 2, 3 
+	};
+
+	vector<glm::vec3> vegetation;
+	vegetation.push_back(glm::vec3(-1.5f, 0.0f, -0.48f));
+	vegetation.push_back(glm::vec3(1.5f, 0.0f, 0.51f));
+	vegetation.push_back(glm::vec3(0.0f, 0.0f, 0.7f));
+	vegetation.push_back(glm::vec3(-0.3f, 0.0f, -2.3f));
+	vegetation.push_back(glm::vec3(0.5f, 0.0f, -0.6f));
+
 	GLuint containerVBO;
 	glGenBuffers(1, &containerVBO);
 	GLuint containerEBO;
@@ -210,16 +230,27 @@ int main()
 	glGenBuffers(1, &planeEBO);
 	unsigned int planeVAO;
 	glGenVertexArrays(1, &planeVAO);
-	// ..:: Initialization code :: ..
-	// 1. bind Vertex Array Object
 	glBindVertexArray(planeVAO);
-	// 2. copy our vertices array in a vertex buffer for OpenGL to use
 	glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
-	// 3. copy our index array in a element buffer for OpenGL to use
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planeEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planeIndices), planeIndices, GL_STATIC_DRAW);
-	// 4. then set the vertex attributes pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	GLuint transparentVBO;
+	glGenBuffers(1, &transparentVBO);
+	GLuint transparentEBO;
+	glGenBuffers(1, &transparentEBO);
+	unsigned int transparentVAO;
+	glGenVertexArrays(1, &transparentVAO);
+	glBindVertexArray(transparentVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, transparentVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(transparentVertices), transparentVertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, transparentEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(transparentIndices), transparentIndices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
@@ -227,13 +258,13 @@ int main()
 
 	Shader shader;
 	shader.load("container.vert", "container.frag");
-	Shader shaderSingleColor;
-	shaderSingleColor.load("container.vert", "singleColor.frag");
 
 	GLuint containerTex;
 	loadImage(containerTex, "../../Resources/Textures/marble.jpg");
 	GLuint planeTex;
 	loadImage(planeTex, "../../Resources/Textures/metal.png");
+	GLuint transparentTex;
+	loadImage(transparentTex, "../../Resources/Textures/grass.png");
 
 	glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_ALWAYS); // always pass the depth test (same effect as glDisable(GL_DEPTH_TEST))
@@ -256,15 +287,9 @@ int main()
 
 		// rendering commands here
 		//
-
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_STENCIL_TEST);
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glStencilMask(0x00); // make sure we don't update the stencil buffer while drawing the floor
 		shader.use();
 		// floor
 		glBindVertexArray(planeVAO);
@@ -272,8 +297,6 @@ int main()
 		shader.setMatrix4fv("model", glm::mat4());
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		glStencilMask(0xFF);
 		glm::mat4 model;
 		glm::mat4 view = camera.getLookatMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
@@ -291,29 +314,17 @@ int main()
 		shader.setMatrix4fv("model", model);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
-		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		glStencilMask(0x00);
-		glDisable(GL_DEPTH_TEST);
-		shaderSingleColor.use();
-		shaderSingleColor.setMatrix4fv("view", view);
-		shaderSingleColor.setMatrix4fv("projection", projection);
-		// scaled up cubes
-		glBindVertexArray(containerVAO);
+		//grass
+		glBindVertexArray(transparentVAO);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, containerTex);
-		model = glm::mat4();
-		model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-		model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
-		shaderSingleColor.setMatrix4fv("model", model);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-		model = glm::mat4();
-		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
-		shaderSingleColor.setMatrix4fv("model", model);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
-		glStencilMask(0xFF);
-		glEnable(GL_DEPTH_TEST);
+		glBindTexture(GL_TEXTURE_2D, transparentTex);
+		for (GLuint i = 0; i < vegetation.size(); i++)
+		{
+			model = glm::mat4();
+			model = glm::translate(model, vegetation[i]);
+			shader.setMatrix4fv("model", model);
+			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		}
 
 		glfwSwapBuffers(window);
 		// check and call events and swap the buffers
@@ -327,6 +338,9 @@ int main()
 	glDeleteVertexArrays(1, &planeVAO);
 	glDeleteBuffers(1, &planeEBO);
 	glDeleteBuffers(1, &planeVBO);
+	glDeleteVertexArrays(1, &transparentVAO);
+	glDeleteBuffers(1, &transparentEBO);
+	glDeleteBuffers(1, &transparentVBO);
 
 	glfwTerminate();
 
