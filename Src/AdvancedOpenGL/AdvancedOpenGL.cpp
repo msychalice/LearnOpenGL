@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #define STB_IMAGE_IMPLEMENTATION
@@ -204,6 +205,7 @@ int main()
 	vegetation.push_back(glm::vec3(-0.3f, 0.0f, -2.3f));
 	vegetation.push_back(glm::vec3(0.5f, 0.0f, -0.6f));
 
+
 	GLuint containerVBO;
 	glGenBuffers(1, &containerVBO);
 	GLuint containerEBO;
@@ -288,6 +290,13 @@ int main()
 		// input
 		processInput(window, deltaTime);
 
+		std::map<float, glm::vec3> sorted;
+		for (unsigned int i = 0; i < vegetation.size(); i++)
+		{
+			float distance = glm::length(camera.getPos() - vegetation[i]);
+			sorted[distance] = vegetation[i];
+		}
+
 		// rendering commands here
 		//
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -321,12 +330,13 @@ int main()
 		glBindVertexArray(transparentVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, transparentTex);
-		for (GLuint i = 0; i < vegetation.size(); i++)
+		for (map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); it++)
 		{
 			model = glm::mat4();
-			model = glm::translate(model, vegetation[i]);
+			model = glm::translate(model, it->second);
 			shader.setMatrix4fv("model", model);
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
 		}
 
 		glfwSwapBuffers(window);
