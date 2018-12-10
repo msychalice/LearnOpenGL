@@ -265,10 +265,12 @@ int main()
 	GLuint planeTex;
 	loadImage(planeTex, "../../Resources/Textures/metal.png");
 	GLuint transparentTex;
-	loadImage(transparentTex, "../../Resources/Textures/grass.png");
+	loadImage(transparentTex, "../../Resources/Textures/window.png");
 
 	glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_ALWAYS); // always pass the depth test (same effect as glDisable(GL_DEPTH_TEST))
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	float deltaTime = 0.0f;	// Time between current frame and last frame
 	float lastFrame = 0.0f; // Time of last frame
