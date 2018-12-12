@@ -276,12 +276,10 @@ int main()
 		 1.0f,  1.0f,  1.0f,
 		-1.0f,  1.0f,  1.0f,
 
+		 1.0f, -1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
 		-1.0f, -1.0f,  1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		 1.0f, -1.0f,  1.0f
+		 1.0f, -1.0f,  1.0f,
 	};
 
 	GLuint skyboxIndices[] = {  // note that we start from 0!
