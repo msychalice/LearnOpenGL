@@ -460,13 +460,6 @@ int main()
 		// input
 		processInput(window, deltaTime);
 
-		std::map<float, glm::vec3> sorted;
-		for (unsigned int i = 0; i < vegetation.size(); i++)
-		{
-			float distance = glm::length(camera.getPos() - vegetation[i]);
-			sorted[distance] = vegetation[i];
-		}
-
 		// rendering commands here
 		//
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -474,16 +467,6 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glDepthMask(GL_FALSE);
-		skyboxShader.use();
-		glm::mat4 view = camera.getLookatMatrix();
-		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
-		glBindVertexArray(skyboxVAO);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		skyboxShader.setMatrix4fv("view", glm::mat4(glm::mat3(view)));// remove translation from the view matrix
-		skyboxShader.setMatrix4fv("projection", projection);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-		glDepthMask(GL_TRUE);
 
 		shader.use();
 		// floor
@@ -493,6 +476,8 @@ int main()
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glm::mat4 model;
+		glm::mat4 view = camera.getLookatMatrix();
+		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
 		shader.setMatrix4fv("view", view);
 		shader.setMatrix4fv("projection", projection);
 		// cubes
@@ -507,7 +492,26 @@ int main()
 		shader.setMatrix4fv("model", model);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
+		//天空盒, 需要注意的是在所有不透明物体渲染之后和透明物体渲染之前进行
+		glDepthMask(GL_FALSE);
+		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+		skyboxShader.use();
+		glBindVertexArray(skyboxVAO);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		skyboxShader.setMatrix4fv("view", glm::mat4(glm::mat3(view)));// remove translation from the view matrix
+		skyboxShader.setMatrix4fv("projection", projection);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS); // set depth function back to default
+
 		//grass
+		shader.use();
+		std::map<float, glm::vec3> sorted;
+		for (unsigned int i = 0; i < vegetation.size(); i++)
+		{
+			float distance = glm::length(camera.getPos() - vegetation[i]);
+			sorted[distance] = vegetation[i];
+		}
 		glBindVertexArray(transparentVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, transparentTex);
@@ -517,13 +521,14 @@ int main()
 			model = glm::translate(model, it->second);
 			shader.setMatrix4fv("model", model);
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
 		}
+
+
+
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-
 		screenShader.use();
 		glBindVertexArray(quadVAO);
 		glDisable(GL_DEPTH_TEST);
