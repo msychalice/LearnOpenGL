@@ -94,6 +94,38 @@ bool loadImage(GLuint& texture, const char * fileName)
 	return true;
 }
 
+bool loadCubemap(GLuint& texture, vector<string> faces)
+{
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			cout << "Cubemap texture failed to load at path: " << faces[i] << endl;
+			stbi_image_free(data);
+			return false;
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return true;
+}
+
 int main()
 {
 	glfwInit();
@@ -217,6 +249,56 @@ int main()
 	vegetation.push_back(glm::vec3(-0.3f, 0.0f, -2.3f));
 	vegetation.push_back(glm::vec3(0.5f, 0.0f, -0.6f));
 
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
+	GLuint skyboxIndices[] = {  // note that we start from 0!
+		0, 1, 2,
+		2, 3, 0,
+		4, 5, 6,
+		6, 7, 4,
+		8, 9, 10,
+		10, 11, 8,
+		12, 13, 14,
+		14, 15, 12,
+		16, 17, 18,
+		18, 19, 16,
+		20, 21, 22,
+		22, 23, 20
+	};
+
 
 	GLuint containerVBO;
 	glGenBuffers(1, &containerVBO);
@@ -287,10 +369,26 @@ int main()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	GLuint skyboxVBO;
+	glGenBuffers(1, &skyboxVBO);
+	GLuint skyboxEBO;
+	glGenBuffers(1, &skyboxEBO);
+	unsigned int skyboxVAO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(skyboxIndices), skyboxIndices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
 	Shader shader;
 	shader.load("container.vert", "container.frag");
 	Shader screenShader;
 	screenShader.load("screen.vert", "screen.frag");
+	Shader skyboxShader;
+	skyboxShader.load("skybox.vert", "skybox.frag");
 
 	GLuint containerTex;
 	loadImage(containerTex, "../../Resources/Textures/marble.jpg");
@@ -298,6 +396,18 @@ int main()
 	loadImage(planeTex, "../../Resources/Textures/metal.png");
 	GLuint transparentTex;
 	loadImage(transparentTex, "../../Resources/Textures/window.png");
+
+	vector<string> faces
+	{
+		"../../Resources/Textures/skybox/right.jpg",
+		"../../Resources/Textures/skybox/left.jpg",
+		"../../Resources/Textures/skybox/top.jpg",
+		"../../Resources/Textures/skybox/bottom.jpg",
+		"../../Resources/Textures/skybox/front.jpg",
+		"../../Resources/Textures/skybox/back.jpg"
+	};
+	GLuint cubemapTexture;
+	loadCubemap(cubemapTexture, faces);
 
 	glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_ALWAYS); // always pass the depth test (same effect as glDisable(GL_DEPTH_TEST))
@@ -366,6 +476,17 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		glDepthMask(GL_FALSE);
+		skyboxShader.use();
+		glm::mat4 view = camera.getLookatMatrix();
+		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
+		glBindVertexArray(skyboxVAO);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		skyboxShader.setMatrix4fv("view", glm::mat4(glm::mat3(view)));// remove translation from the view matrix
+		skyboxShader.setMatrix4fv("projection", projection);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		glDepthMask(GL_TRUE);
+
 		shader.use();
 		// floor
 		glBindVertexArray(planeVAO);
@@ -374,8 +495,6 @@ int main()
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glm::mat4 model;
-		glm::mat4 view = camera.getLookatMatrix();
-		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
 		shader.setMatrix4fv("view", view);
 		shader.setMatrix4fv("projection", projection);
 		// cubes

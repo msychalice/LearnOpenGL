@@ -134,6 +134,8 @@
     <None Include="screen.frag" />
     <None Include="screen.vert" />
     <None Include="singleColor.frag" />
+    <None Include="skybox.frag" />
+    <None Include="skybox.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
