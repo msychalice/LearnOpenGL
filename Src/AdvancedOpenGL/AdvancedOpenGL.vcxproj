@@ -79,7 +79,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Includes;$(SolutionDir)glfw-3.2.1\deps;$(SolutionDir)glfw-3.2.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glfw3.lib;GLAD.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;assimp.lib;GLAD.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -121,21 +121,29 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Common\Camera.cpp" />
+    <ClCompile Include="..\..\Common\mesh.cpp" />
+    <ClCompile Include="..\..\Common\model.cpp" />
     <ClCompile Include="..\..\Common\Shader.cpp" />
     <ClCompile Include="AdvancedOpenGL.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Common\Camera.h" />
+    <ClInclude Include="..\..\Common\mesh.h" />
+    <ClInclude Include="..\..\Common\model.h" />
     <ClInclude Include="..\..\Common\Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="container.frag" />
     <None Include="container.vert" />
+    <None Include="modelLoading.frag" />
+    <None Include="modelLoading.vert" />
     <None Include="screen.frag" />
     <None Include="screen.vert" />
     <None Include="singleColor.frag" />
     <None Include="skybox.frag" />
     <None Include="skybox.vert" />
+    <None Include="transparent.frag" />
+    <None Include="transparent.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

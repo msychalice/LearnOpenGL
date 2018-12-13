@@ -5,13 +5,12 @@
 #include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "../../Common/Camera.h"
 #include "../../Common/Shader.h"
+#include "../../Common/model.h"
 
 using namespace std;
 
@@ -55,75 +54,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	camera.processScrollEvent((float)xoffset, (float)yoffset);
-}
-
-bool loadImage(GLuint& texture, const char * fileName)
-{
-	glGenTextures(1, &texture);
-	// load and generate the texture
-	int width, height, nrChannels;
-	//stbi_set_flip_vertically_on_load(true);	// should be called before stbi_load
-	GLubyte *data = stbi_load(fileName, &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		GLenum format;
-		if (nrChannels == 1)
-			format = GL_RED;
-		else if (nrChannels == 3)
-			format = GL_RGB;
-		else if (nrChannels == 4)
-			format = GL_RGBA;
-
-		glBindTexture(GL_TEXTURE_2D, texture);
-		// set the texture wrapping/filtering options (on the currently bound texture object)
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-		stbi_image_free(data);
-		return false;
-	}
-	stbi_image_free(data);
-	return true;
-}
-
-bool loadCubemap(GLuint& texture, vector<string> faces)
-{
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
-
-	int width, height, nrChannels;
-	for (unsigned int i = 0; i < faces.size(); i++)
-	{
-		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
-		if (data)
-		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-			);
-			stbi_image_free(data);
-		}
-		else
-		{
-			cout << "Cubemap texture failed to load at path: " << faces[i] << endl;
-			stbi_image_free(data);
-			return false;
-		}
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	return true;
 }
 
 int main()
@@ -381,19 +311,20 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	Shader shader;
-	shader.load("container.vert", "container.frag");
+	Shader containerShader;
+	containerShader.load("container.vert", "container.frag");
+	Shader transparentShader;
+	transparentShader.load("transparent.vert", "transparent.frag");
 	Shader screenShader;
 	screenShader.load("screen.vert", "screen.frag");
 	Shader skyboxShader;
 	skyboxShader.load("skybox.vert", "skybox.frag");
+	Shader modelShader;
+	modelShader.load("modelLoading.vert", "modelLoading.frag");
 
-	GLuint containerTex;
-	loadImage(containerTex, "../../Resources/Textures/marble.jpg");
-	GLuint planeTex;
-	loadImage(planeTex, "../../Resources/Textures/metal.png");
-	GLuint transparentTex;
-	loadImage(transparentTex, "../../Resources/Textures/window.png");
+	GLuint containerTex = Model::TextureFromFile("marble.jpg", "../../Resources/Textures");
+	GLuint planeTex = Model::TextureFromFile("metal.png", "../../Resources/Textures");
+	GLuint transparentTex = Model::TextureFromFile("window.png", "../../Resources/Textures", true);
 
 	vector<string> faces
 	{
@@ -404,14 +335,13 @@ int main()
 		"../../Resources/Textures/skybox/front.jpg",
 		"../../Resources/Textures/skybox/back.jpg"
 	};
-	GLuint cubemapTexture;
-	loadCubemap(cubemapTexture, faces);
+	GLuint cubemapTexture = Model::LoadCubemap(faces);
+
+	Model ourModel("../../Resources/Objects/nanosuit_reflection/nanosuit.obj");
 
 	glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_ALWAYS); // always pass the depth test (same effect as glDisable(GL_DEPTH_TEST))
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
+
 
 	unsigned int framebuffer;
 	glGenFramebuffers(1, &framebuffer);
@@ -447,8 +377,14 @@ int main()
 	float deltaTime = 0.0f;	// Time between current frame and last frame
 	float lastFrame = 0.0f; // Time of last frame
 
-	shader.use();
-	shader.setInt("texture1", 0);
+	containerShader.use();
+	containerShader.setInt("texture1", 0);
+	transparentShader.use();
+	transparentShader.setInt("texture1", 0);
+	skyboxShader.use();
+	skyboxShader.setInt("skybox", 0);
+	screenShader.use();
+	screenShader.setInt("screenTexture", 0);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -468,31 +404,49 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-		shader.use();
-		// floor
-		glBindVertexArray(planeVAO);
-		glBindTexture(GL_TEXTURE_2D, planeTex);
-		shader.setMatrix4fv("model", glm::mat4());
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
 		glm::mat4 model;
 		glm::mat4 view = camera.getLookatMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
-		shader.setMatrix4fv("view", view);
-		shader.setMatrix4fv("projection", projection);
-		// cubes
+
+		modelShader.use();
+		view = camera.getLookatMatrix();
+		projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
+		modelShader.setMatrix4fv("projection", projection);
+		modelShader.setMatrix4fv("view", view);
+		model = glm::mat4();
+		model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.5f)); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+		modelShader.setMatrix4fv("model", model);
+		ourModel.Draw(modelShader);
+
+		//// floor
+		containerShader.use();
+		containerShader.setMatrix4fv("model", glm::mat4());
+		containerShader.setMatrix4fv("view", view);
+		containerShader.setMatrix4fv("projection", projection);
+		glBindVertexArray(planeVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, planeTex);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		//// cubes
+		containerShader.use();
+		containerShader.setMatrix4fv("view", view);
+		containerShader.setMatrix4fv("projection", projection);
 		glBindVertexArray(containerVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, containerTex);
+		model = glm::mat4();
 		model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-		shader.setMatrix4fv("model", model);
+		containerShader.setMatrix4fv("model", model);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		model = glm::mat4();
 		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-		shader.setMatrix4fv("model", model);
+		containerShader.setMatrix4fv("model", model);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
-		//天空盒, 需要注意的是在所有不透明物体渲染之后和透明物体渲染之前进行
+
+		////天空盒, 需要注意的是在所有不透明物体渲染之后和透明物体渲染之前进行
 		glDepthMask(GL_FALSE);
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 		skyboxShader.use();
@@ -504,8 +458,13 @@ int main()
 		glDepthMask(GL_TRUE);
 		glDepthFunc(GL_LESS); // set depth function back to default
 
-		//grass
-		shader.use();
+
+		////grass
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		transparentShader.use();
+		transparentShader.setMatrix4fv("view", view);
+		transparentShader.setMatrix4fv("projection", projection);
 		std::map<float, glm::vec3> sorted;
 		for (unsigned int i = 0; i < vegetation.size(); i++)
 		{
@@ -519,11 +478,10 @@ int main()
 		{
 			model = glm::mat4();
 			model = glm::translate(model, it->second);
-			shader.setMatrix4fv("model", model);
+			transparentShader.setMatrix4fv("model", model);
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		}
-
-
+		glDisable(GL_BLEND);
 
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default

@@ -24,8 +24,8 @@ public:
     // draws the model, and thus all its meshes
 	void Draw(Shader& shader);
 
-	static unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
-    
+	static GLuint TextureFromFile(const char *path, const string &directory, bool transparent = false, bool gamma = false);
+	static GLuint LoadCubemap(vector<string> faces);
 private:
     /*  Functions   */
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
