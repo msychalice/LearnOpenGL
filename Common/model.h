@@ -22,7 +22,7 @@ public:
 	Model(string const &path, bool gamma = false);
 
     // draws the model, and thus all its meshes
-	void Draw(Shader shader);
+	void Draw(Shader& shader);
 
 	static unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
     
