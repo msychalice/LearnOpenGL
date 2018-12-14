@@ -385,6 +385,8 @@ int main()
 	skyboxShader.setInt("skybox", 0);
 	screenShader.use();
 	screenShader.setInt("screenTexture", 0);
+	modelShader.use();
+	modelShader.setInt("skybox", 4);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -417,6 +419,11 @@ int main()
 		model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.5f)); // translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
 		modelShader.setMatrix4fv("model", model);
+		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(view * model)));
+		modelShader.setMatrix3fv("normalMatrix", normalMatrix);
+		//cout << " draw model " << endl;
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 		ourModel.Draw(modelShader);
 
 		//// floor
@@ -513,6 +520,7 @@ int main()
 	glDeleteBuffers(1, &quadVBO);
 
 	glfwTerminate();
+	//system("Pause");
 
 	return 0;
 }
