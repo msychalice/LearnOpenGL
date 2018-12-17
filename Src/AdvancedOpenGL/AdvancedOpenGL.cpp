@@ -320,7 +320,8 @@ int main()
 	Shader skyboxShader;
 	skyboxShader.load("skybox.vert", "skybox.frag");
 	Shader modelShader;
-	modelShader.load("modelLoading.vert", "modelLoading.frag");
+	//modelShader.load("modelLoading.vert", "modelLoading.frag");
+	modelShader.load("modelLoading.vert", "modelLoading.frag", "modelLoading.geom");
 
 	GLuint containerTex = Model::TextureFromFile("marble.jpg", "../../Resources/Textures");
 	GLuint planeTex = Model::TextureFromFile("metal.png", "../../Resources/Textures");
@@ -421,6 +422,7 @@ int main()
 		modelShader.setMatrix4fv("model", model);
 		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(view * model)));
 		modelShader.setMatrix3fv("normalMatrix", normalMatrix);
+		modelShader.setFloat("time", (float)glfwGetTime());
 		//cout << " draw model " << endl;
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);

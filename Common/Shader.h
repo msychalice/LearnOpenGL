@@ -12,7 +12,7 @@ public:
 	Shader();
 	~Shader();
 	//reads and builds the shader
-	bool load(const GLchar* vertexPath, const GLchar* fragmentPath);
+	bool load(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* geometryPath = nullptr);
 	// use/activate the shader
 	bool use();
 	// utility uniform functions

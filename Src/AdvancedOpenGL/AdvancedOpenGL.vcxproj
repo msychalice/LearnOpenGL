@@ -136,6 +136,7 @@
     <None Include="container.frag" />
     <None Include="container.vert" />
     <None Include="modelLoading.frag" />
+    <None Include="modelLoading.geom" />
     <None Include="modelLoading.vert" />
     <None Include="screen.frag" />
     <None Include="screen.vert" />
