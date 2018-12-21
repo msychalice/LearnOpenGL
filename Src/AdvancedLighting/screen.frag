@@ -5,10 +5,18 @@ out vec4 FragColor;
 in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
+uniform bool gamma;
 
 void main()
 { 
 	FragColor = texture(screenTexture, TexCoords);
+
+	if(gamma)
+	{
+		float gamma = 2.2;
+		FragColor.rgb = pow(FragColor.rgb, vec3(1.0/gamma));
+	}
+
 //	FragColor = vec4(vec3(1.0 - texture(screenTexture, TexCoords)), 1.0);
 //    FragColor = texture(screenTexture, TexCoords);
 //    float average = 0.2126 * FragColor.r + 0.7152 * FragColor.g + 0.0722 * FragColor.b;

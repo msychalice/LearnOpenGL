@@ -25,7 +25,7 @@ public:
 	void Draw(Shader& shader);
 
 	static GLuint TextureFromFile(const char *path, const string &directory, bool transparent = false, bool gamma = false);
-	static GLuint LoadCubemap(vector<string> faces);
+	static GLuint LoadCubemap(vector<string> faces, bool gamma = false);
 private:
     /*  Functions   */
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.

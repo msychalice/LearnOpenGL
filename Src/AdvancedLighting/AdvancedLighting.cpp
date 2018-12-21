@@ -18,8 +18,8 @@ using namespace std;
 float lastX = 0.0f;
 float lastY = 0.0f;
 bool firstMouse = true;
-bool blinn = false;
-bool blinnKeyPressed = false;
+bool gammaEnabled = false;
+bool gammaKeyPressed = false;
 
 
 glm::vec3 cameraPos(0.0f, 0.0f, 3.0f);
@@ -37,14 +37,14 @@ void processInput(GLFWwindow *window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !blinnKeyPressed)
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !gammaKeyPressed)
 	{
-		blinn = !blinn;
-		blinnKeyPressed = true;
+		gammaEnabled = !gammaEnabled;
+		gammaKeyPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE)
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE)
 	{
-		blinnKeyPressed = false;
+		gammaKeyPressed = false;
 	}
 }
 
@@ -173,49 +173,51 @@ int main()
 	Shader screenShader;
 	screenShader.load("screen.vert", "screen.frag");
 
-	GLuint planeTex = Model::TextureFromFile("wood.png", "../../Resources/Textures");
+	GLuint planeTex = Model::TextureFromFile("wood.png", "../../Resources/Textures", false, false);
+	GLuint planeTexGamma = Model::TextureFromFile("wood.png", "../../Resources/Textures", false, true);
 
 	glEnable(GL_MULTISAMPLE); // Enabled by default on some drivers, but not all so always enable to make sure
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	//glEnable(GL_FRAMEBUFFER_SRGB);
 
 
-	unsigned int framebuffer;
-	glGenFramebuffers(1, &framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	// generate texture
-	unsigned int texColorBuffer;
-	glGenTextures(1, &texColorBuffer);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColorBuffer);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, screenWidth, screenHeight, GL_TRUE);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-	// attach it to currently bound framebuffer object
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texColorBuffer, 0);
-	unsigned int rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//unsigned int framebuffer;
+	//glGenFramebuffers(1, &framebuffer);
+	//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	//// generate texture
+	//unsigned int texColorBuffer;
+	//glGenTextures(1, &texColorBuffer);
+	//glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColorBuffer);
+	//glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, screenWidth, screenHeight, GL_TRUE);
+	//glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+	//// attach it to currently bound framebuffer object
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texColorBuffer, 0);
+	//unsigned int rbo;
+	//glGenRenderbuffers(1, &rbo);
+	//glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	//glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
+	//glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	//	cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// configure second post-processing framebuffer
-	unsigned int intermediateFBO;
-	glGenFramebuffers(1, &intermediateFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
-	// create a color attachment texture
-	unsigned int screenTexture;
-	glGenTextures(1, &screenTexture);
-	glBindTexture(GL_TEXTURE_2D, screenTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	// we only need a color buffer
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//// configure second post-processing framebuffer
+	//unsigned int intermediateFBO;
+	//glGenFramebuffers(1, &intermediateFBO);
+	//glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+	//// create a color attachment texture
+	//unsigned int screenTexture;
+	//glGenTextures(1, &screenTexture);
+	//glBindTexture(GL_TEXTURE_2D, screenTexture);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	// we only need a color buffer
+	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	//	cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
 	// draw as wireframe
@@ -243,7 +245,7 @@ int main()
 
 		// rendering commands here
 		//
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -261,27 +263,28 @@ int main()
 		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(view * model)));
 		planeShader.setMatrix3fv("normalMatrix", normalMatrix);
 		planeShader.setVector3fv("lightPos", glm::vec3(view * glm::vec4(lightPos, 1.0f)));
-        planeShader.setInt("blinn", blinn);
+        planeShader.setInt("gamma", gammaEnabled);
 		glBindVertexArray(planeVAO);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, planeTex);
+		glBindTexture(GL_TEXTURE_2D, gammaEnabled ? planeTexGamma : planeTex);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        cout << (blinn ? "Blinn-Phong" : "Phong") << endl;
+        cout << (gammaEnabled ? "Gamma" : "Un-Gamma") << endl;
 
 
-		// blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
-		glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		//// blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
+		//glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+		//glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		screenShader.use();
-		glBindVertexArray(quadVAO);
-		glDisable(GL_DEPTH_TEST);
-		glBindTexture(GL_TEXTURE_2D, screenTexture);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
+		//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		//glClear(GL_COLOR_BUFFER_BIT);
+		//screenShader.use();
+  //      screenShader.setInt("gamma", gammaEnabled);
+		//glBindVertexArray(quadVAO);
+		//glDisable(GL_DEPTH_TEST);
+		//glBindTexture(GL_TEXTURE_2D, screenTexture);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		// check and call events and swap the buffers
