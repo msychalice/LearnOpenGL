@@ -215,27 +215,27 @@ int main()
 		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//// configure second post-processing framebuffer
-	//unsigned int intermediateFBO;
-	//glGenFramebuffers(1, &intermediateFBO);
-	//glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
-	//// create a color attachment texture
-	//unsigned int screenTexture;
-	//glGenTextures(1, &screenTexture);
-	//glBindTexture(GL_TEXTURE_2D, screenTexture);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//unsigned int screenTextureGamma;
-	//glGenTextures(1, &screenTextureGamma);
-	//glBindTexture(GL_TEXTURE_2D, screenTextureGamma);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture, 0);	// we only need a color buffer
-	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	//	cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// configure second post-processing framebuffer
+	unsigned int intermediateFBO;
+	glGenFramebuffers(1, &intermediateFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+	// create a color attachment texture
+	unsigned int screenTexture;
+	glGenTextures(1, &screenTexture);
+	glBindTexture(GL_TEXTURE_2D, screenTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned int screenTextureGamma;
+	glGenTextures(1, &screenTextureGamma);
+	glBindTexture(GL_TEXTURE_2D, screenTextureGamma);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture, 0);	// we only need a color buffer
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
 	// draw as wireframe
@@ -263,9 +263,9 @@ int main()
 
 		// rendering commands here
 		//
-		//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -291,24 +291,24 @@ int main()
         cout << (gammaEnabled ? "Gamma" : "Un-Gamma") << endl;
 
 
-		//// blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
-		//glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture, 0);	// we only need a color buffer
-		//glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
-		//glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		// blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
+		glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture, 0);	// we only need a color buffer
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+		glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-		//glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
-		//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		//glClear(GL_COLOR_BUFFER_BIT);
-		//screenShader.use();
-  //      screenShader.setInt("gamma", gammaEnabled);
-		//glBindVertexArray(quadVAO);
-		//glDisable(GL_DEPTH_TEST);
-		//glActiveTexture(GL_TEXTURE0);
-		////glBindTexture(GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		screenShader.use();
+        screenShader.setInt("gamma", gammaEnabled);
+		glBindVertexArray(quadVAO);
+		glDisable(GL_DEPTH_TEST);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture);
 		//glBindTexture(GL_TEXTURE_2D, gammaEnabled ? texColorBufferGamma : texColorBuffer);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		// check and call events and swap the buffers
