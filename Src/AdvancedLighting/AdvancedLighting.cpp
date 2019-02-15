@@ -24,6 +24,8 @@ bool gammaKeyPressed = false;
 glm::vec3 cameraPos(0.0f, 0.0f, 3.0f);
 Camera camera(cameraPos);
 
+#define MSAA_ENABLED
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -75,8 +77,11 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	//GLuint samples = 4;
-	//glfwWindowHint(GLFW_SAMPLES, samples);
+
+#ifdef MSAA_ENABLED
+	GLuint samples = 4;
+	glfwWindowHint(GLFW_SAMPLES, samples);
+#endif
 
 	GLuint screenWidth = 1280;
 	GLuint screenHeight = 720;
@@ -175,7 +180,9 @@ int main()
 	GLuint planeTex = Model::TextureFromFile("wood.png", "../../Resources/Textures", false, false);
 	GLuint planeTexGamma = Model::TextureFromFile("wood.png", "../../Resources/Textures", false, true);
 
-	//glEnable(GL_MULTISAMPLE); // Enabled by default on some drivers, but not all so always enable to make sure
+#ifdef MSAA_ENABLED
+	glEnable(GL_MULTISAMPLE); // Enabled by default on some drivers, but not all so always enable to make sure
+#endif
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	//glEnable(GL_FRAMEBUFFER_SRGB);
@@ -187,28 +194,40 @@ int main()
 	// generate texture
 	unsigned int texColorBuffer;
 	glGenTextures(1, &texColorBuffer);
-	//glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColorBuffer);
-	//glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, screenWidth, screenHeight, GL_TRUE);
-	//glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+#ifdef MSAA_ENABLED
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColorBuffer);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, screenWidth, screenHeight, GL_TRUE);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+#else
 	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
+#endif
 	unsigned int texColorBufferGamma;
 	glGenTextures(1, &texColorBufferGamma);
-	//glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColorBufferGamma);
-	//glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_SRGB, screenWidth, screenHeight, GL_TRUE);
-	//glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+#ifdef MSAA_ENABLED
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColorBufferGamma);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_SRGB, screenWidth, screenHeight, GL_TRUE);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+#else
 	glBindTexture(GL_TEXTURE_2D, texColorBufferGamma);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
+#endif
 	// attach it to currently bound framebuffer object
-	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
+#ifdef MSAA_ENABLED
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
+#else
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
+#endif
 	unsigned int rbo;
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	//glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
+#ifdef MSAA_ENABLED
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
+#else
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
+#endif
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -264,8 +283,11 @@ int main()
 		// rendering commands here
 		//
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
+#ifdef MSAA_ENABLED
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
+#else
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
+#endif
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -307,7 +329,6 @@ int main()
 		glDisable(GL_DEPTH_TEST);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture);
-		//glBindTexture(GL_TEXTURE_2D, gammaEnabled ? texColorBufferGamma : texColorBuffer);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
