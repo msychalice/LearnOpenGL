@@ -41,9 +41,9 @@ void main()
 	specular *= attenuation;
 
     FragColor = vec4(color * (diffuse + specular), 1.0);
-//	if(gamma)
-//	{
-//		float gamma = 2.2;
-//		FragColor.rgb = pow(FragColor.rgb, vec3(1.0/gamma));
-//	}
+	if(gamma)
+	{
+		float gamma = 2.2;
+		FragColor.rgb = pow(FragColor.rgb, vec3(1.0/gamma));
+	}
 }
