@@ -284,7 +284,8 @@ int main()
 		//
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 #ifdef MSAA_ENABLED
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texColorBuffer, 0);
+		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
 #else
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
 #endif
@@ -315,7 +316,8 @@ int main()
 
 		// blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
 		glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture, 0);	// we only need a color buffer
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	// we only need a color buffer
+		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture, 0);	// we only need a color buffer
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
 		glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -328,7 +330,8 @@ int main()
 		glBindVertexArray(quadVAO);
 		glDisable(GL_DEPTH_TEST);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture);
+		glBindTexture(GL_TEXTURE_2D, screenTexture);
+		//glBindTexture(GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
