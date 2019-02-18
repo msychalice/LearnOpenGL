@@ -24,7 +24,7 @@ bool gammaKeyPressed = false;
 glm::vec3 cameraPos(0.0f, 0.0f, 3.0f);
 Camera camera(cameraPos);
 
-#define MSAA_ENABLED
+//#define MSAA_ENABLED
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -201,6 +201,8 @@ int main()
 #else
 	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 #endif
 	unsigned int texColorBufferGamma;
@@ -212,6 +214,8 @@ int main()
 #else
 	glBindTexture(GL_TEXTURE_2D, texColorBufferGamma);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 #endif
 	// attach it to currently bound framebuffer object
@@ -287,7 +291,8 @@ int main()
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texColorBuffer, 0);
 		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
 #else
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
 #endif
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -330,7 +335,7 @@ int main()
 		glBindVertexArray(quadVAO);
 		glDisable(GL_DEPTH_TEST);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, screenTexture);
+		glBindTexture(GL_TEXTURE_2D, texColorBuffer);
 		//glBindTexture(GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
