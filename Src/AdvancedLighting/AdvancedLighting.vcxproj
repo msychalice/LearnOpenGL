@@ -135,8 +135,12 @@
   <ItemGroup>
     <None Include="advancedLighting.frag" />
     <None Include="advancedLighting.vert" />
+    <None Include="debug_depth_quad.frag" />
+    <None Include="debug_depth_quad.vert" />
     <None Include="screen.frag" />
     <None Include="screen.vert" />
+    <None Include="shadow_mapping_depth.frag" />
+    <None Include="shadow_mapping_depth.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

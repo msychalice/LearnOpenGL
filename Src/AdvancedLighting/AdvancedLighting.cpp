@@ -24,8 +24,6 @@ bool gammaKeyPressed = false;
 glm::vec3 cameraPos(0.0f, 0.0f, 3.0f);
 Camera camera(cameraPos);
 
-//#define MSAA_ENABLED
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -78,11 +76,6 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-#ifdef MSAA_ENABLED
-	GLuint samples = 4;
-	glfwWindowHint(GLFW_SAMPLES, samples);
-#endif
-
 	GLuint screenWidth = 1280;
 	GLuint screenHeight = 720;
 
@@ -110,13 +103,58 @@ int main()
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
+	GLfloat containerVertices[] = {
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+
+	-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
+
+	-0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+
+	 0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f, 0.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f, 0.0f, 0.0f
+	};
+	GLuint containerIndices[] = {  // note that we start from 0!
+		0, 1, 2,
+		2, 3, 0,
+		4, 5, 6,
+		6, 7, 4,
+		8, 9, 10,
+		10, 11, 8,
+		12, 13, 14,
+		14, 15, 12,
+		16, 17, 18,
+		18, 19, 16,
+		20, 21, 22,
+		22, 23, 20
+	};
 
 	float planeVertices[] = {
 		// positions            // normals         // texcoords
-		-10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
-		-10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-		 10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
-		 10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,  10.0f, 10.0f
+		-25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+		-25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+		 25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+		 25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
 	};
 	GLuint planeIndices[] = {  // note that we start from 0!
 		0, 1, 2,
@@ -134,6 +172,22 @@ int main()
 		0, 1, 2,
 		0, 2, 3
 	};
+
+	GLuint containerVBO;
+	glGenBuffers(1, &containerVBO);
+	GLuint containerEBO;
+	glGenBuffers(1, &containerEBO);
+	unsigned int containerVAO;
+	glGenVertexArrays(1, &containerVAO);
+	glBindVertexArray(containerVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, containerVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(containerVertices), containerVertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, containerEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(containerIndices), containerIndices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 
 	GLuint planeVBO;
@@ -172,92 +226,36 @@ int main()
 	glEnableVertexAttribArray(1);
 
 
-	Shader planeShader;
-	planeShader.load("advancedLighting.vert", "advancedLighting.frag");
-	Shader screenShader;
-	screenShader.load("screen.vert", "screen.frag");
+	Shader simpleDepthShader;
+	simpleDepthShader.load("shadow_mapping_depth.vert", "shadow_mapping_depth.frag");
+	Shader debugDepthQuad;
+	debugDepthQuad.load("debug_depth_quad.vert", "debug_depth_quad.frag");
 
 	GLuint planeTex = Model::TextureFromFile("wood.png", "../../Resources/Textures", false, false);
-	GLuint planeTexGamma = Model::TextureFromFile("wood.png", "../../Resources/Textures", false, true);
 
-#ifdef MSAA_ENABLED
-	glEnable(GL_MULTISAMPLE); // Enabled by default on some drivers, but not all so always enable to make sure
-#endif
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	//glEnable(GL_FRAMEBUFFER_SRGB);
 
+	// configure depth map FBO
+	// -----------------------
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	// create depth texture
+	unsigned int depthMap;
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 
-	unsigned int framebuffer;
-	glGenFramebuffers(1, &framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	// generate texture
-	unsigned int texColorBuffer;
-	glGenTextures(1, &texColorBuffer);
-#ifdef MSAA_ENABLED
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColorBuffer);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, screenWidth, screenHeight, GL_TRUE);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-#else
-	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-#endif
-	unsigned int texColorBufferGamma;
-	glGenTextures(1, &texColorBufferGamma);
-#ifdef MSAA_ENABLED
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColorBufferGamma);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_SRGB, screenWidth, screenHeight, GL_TRUE);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-#else
-	glBindTexture(GL_TEXTURE_2D, texColorBufferGamma);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-#endif
-	// attach it to currently bound framebuffer object
-#ifdef MSAA_ENABLED
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
-#else
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
-#endif
-	unsigned int rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-#ifdef MSAA_ENABLED
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
-#else
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
-#endif
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// configure second post-processing framebuffer
-	unsigned int intermediateFBO;
-	glGenFramebuffers(1, &intermediateFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
-	// create a color attachment texture
-	unsigned int screenTexture;
-	glGenTextures(1, &screenTexture);
-	glBindTexture(GL_TEXTURE_2D, screenTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	unsigned int screenTextureGamma;
-	glGenTextures(1, &screenTextureGamma);
-	glBindTexture(GL_TEXTURE_2D, screenTextureGamma);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture, 0);	// we only need a color buffer
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
@@ -267,12 +265,10 @@ int main()
 	float deltaTime = 0.0f;	// Time between current frame and last frame
 	float lastFrame = 0.0f; // Time of last frame
 
-	planeShader.use();
-	planeShader.setInt("floorTexture", 0);
-	screenShader.use();
-	screenShader.setInt("screenTexture", 0);
+	debugDepthQuad.use();
+	debugDepthQuad.setInt("depthMap", 0);
 
-    glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
+    glm::vec3 lightPos(-2.0f, 4.0f, -1.0f);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -286,57 +282,65 @@ int main()
 
 		// rendering commands here
 		//
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-#ifdef MSAA_ENABLED
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texColorBuffer, 0);
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
-#else
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? texColorBufferGamma : texColorBuffer, 0);
-#endif
-		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-		glm::mat4 model;
-		glm::mat4 view = camera.getLookatMatrix();
-		glm::mat4 projection = camera.getProjectionMatrix((float)screenWidth, (float)screenHeight);
+		// 1. render depth of scene to texture (from light's perspective)
+		// --------------------------------------------------------------
+		glm::mat4 lightProjection, lightView;
+		glm::mat4 lightSpaceMatrix;
+		float near_plane = 1.0f, far_plane = 7.5f;
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
+		// render scene from light's point of view
+		simpleDepthShader.use();
+		simpleDepthShader.setMatrix4fv("lightSpaceMatrix", lightSpaceMatrix);
 
-		//// floor
-		planeShader.use();
-		planeShader.setMatrix4fv("model", glm::mat4());
-		planeShader.setMatrix4fv("view", view);
-		planeShader.setMatrix4fv("projection", projection);
-		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(view * model)));
-		planeShader.setMatrix3fv("normalMatrix", normalMatrix);
-		planeShader.setVector3fv("lightPos", glm::vec3(view * glm::vec4(lightPos, 1.0f)));
-        planeShader.setInt("gamma", gammaEnabled);
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, planeTex);
+
+		// floor
+		glm::mat4 model = glm::mat4(1.0f);
+		simpleDepthShader.setMatrix4fv("model", model);
 		glBindVertexArray(planeVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gammaEnabled ? planeTexGamma : planeTex);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        cout << (gammaEnabled ? "Gamma" : "Un-Gamma") << endl;
+		// cubes
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0));
+		model = glm::scale(model, glm::vec3(0.5f));
+		simpleDepthShader.setMatrix4fv("model", model);
+		glBindVertexArray(containerVAO);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 1.0));
+		model = glm::scale(model, glm::vec3(0.5f));
+		simpleDepthShader.setMatrix4fv("model", model);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 2.0));
+		model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
+		model = glm::scale(model, glm::vec3(0.25));
+		simpleDepthShader.setMatrix4fv("model", model);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+		// reset viewport
+		glViewport(0, 0, screenWidth, screenHeight);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
-		glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	// we only need a color buffer
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture, 0);	// we only need a color buffer
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
-		glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		screenShader.use();
-        screenShader.setInt("gamma", gammaEnabled);
-		glBindVertexArray(quadVAO);
-		glDisable(GL_DEPTH_TEST);
+		// render Depth map to quad for visual debugging
+		// ---------------------------------------------
+		debugDepthQuad.use();
+		debugDepthQuad.setFloat("near_plane", near_plane);
+		debugDepthQuad.setFloat("far_plane", far_plane);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-		//glBindTexture(GL_TEXTURE_2D, gammaEnabled ? screenTextureGamma : screenTexture);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+		glBindVertexArray(quadVAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
