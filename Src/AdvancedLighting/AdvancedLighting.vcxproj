@@ -139,6 +139,8 @@
     <None Include="debug_depth_quad.vert" />
     <None Include="screen.frag" />
     <None Include="screen.vert" />
+    <None Include="shadow_mapping.frag" />
+    <None Include="shadow_mapping.vert" />
     <None Include="shadow_mapping_depth.frag" />
     <None Include="shadow_mapping_depth.vert" />
   </ItemGroup>
