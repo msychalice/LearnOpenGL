@@ -137,6 +137,11 @@
     <None Include="advancedLighting.vert" />
     <None Include="debug_depth_quad.frag" />
     <None Include="debug_depth_quad.vert" />
+    <None Include="point_shadows.frag" />
+    <None Include="point_shadows.vert" />
+    <None Include="point_shadows_depth.frag" />
+    <None Include="point_shadows_depth.geom" />
+    <None Include="point_shadows_depth.vert" />
     <None Include="screen.frag" />
     <None Include="screen.vert" />
     <None Include="shadow_mapping.frag" />
