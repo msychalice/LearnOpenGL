@@ -139,6 +139,8 @@
     <None Include="debug_depth_quad.vert" />
     <None Include="normal_mapping.frag" />
     <None Include="normal_mapping.vert" />
+    <None Include="parallax_mapping.frag" />
+    <None Include="parallax_mapping.vert" />
     <None Include="point_shadows.frag" />
     <None Include="point_shadows.vert" />
     <None Include="point_shadows_depth.frag" />

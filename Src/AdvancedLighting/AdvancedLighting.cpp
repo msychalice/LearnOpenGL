@@ -20,6 +20,7 @@ float lastY = 0.0f;
 bool firstMouse = true;
 bool normalMappingEnabled = false;
 bool normalMappingKeyPressed = false;
+float heightScale = 0.1f;
 
 glm::vec3 cameraPos(0.0f, 0.0f, 3.0f);
 Camera camera(cameraPos);
@@ -44,6 +45,21 @@ void processInput(GLFWwindow *window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE)
 	{
 		normalMappingKeyPressed = false;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		if (heightScale > 0.0f)
+			heightScale -= 0.0005f;
+		else
+			heightScale = 0.0f;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		if (heightScale < 1.0f)
+			heightScale += 0.0005f;
+		else
+			heightScale = 1.0f;
 	}
 }
 
@@ -237,10 +253,11 @@ int main()
 
 
 	Shader shader;
-	shader.load("normal_mapping.vert", "normal_mapping.frag");
+	shader.load("parallax_mapping.vert", "parallax_mapping.frag");
 
-	GLuint diffuseMap = Model::TextureFromFile("brickwall.jpg", "../../Resources/Textures", false, false);
-	GLuint normalMap = Model::TextureFromFile("brickwall_normal.jpg", "../../Resources/Textures", false, false);
+	GLuint diffuseMap = Model::TextureFromFile("bricks2.jpg", "../../Resources/Textures", false, false);
+	GLuint normalMap = Model::TextureFromFile("bricks2_normal.jpg", "../../Resources/Textures", false, false);
+	GLuint heightMap = Model::TextureFromFile("bricks2_disp.jpg", "../../Resources/Textures", false, false);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -254,6 +271,7 @@ int main()
 	shader.use();
 	shader.setInt("diffuseMap", 0);
 	shader.setInt("normalMap", 1);
+	shader.setInt("depthMap", 2);
 
 	glm::vec3 lightPos(0.5f, 1.0f, 0.3f);
 
@@ -284,11 +302,14 @@ int main()
 		shader.setMatrix4fv("model", model);
 		shader.setVector3fv("viewPos", camera.getPos());
 		shader.setVector3fv("lightPos", lightPos);
-		shader.setInt("enable_normal_mapping", normalMappingEnabled);
+		shader.setFloat("heightScale", heightScale); // adjust with Q and E keys
+		std::cout << heightScale << std::endl;
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, normalMap);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, heightMap);
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
