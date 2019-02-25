@@ -135,12 +135,19 @@
   <ItemGroup>
     <None Include="advancedLighting.frag" />
     <None Include="advancedLighting.vert" />
+    <None Include="bloom.frag" />
+    <None Include="bloom.vert" />
+    <None Include="bloom_final.frag" />
+    <None Include="bloom_final.vert" />
+    <None Include="blur.frag" />
+    <None Include="blur.vert" />
     <None Include="debug_depth_quad.frag" />
     <None Include="debug_depth_quad.vert" />
     <None Include="hdr.frag" />
     <None Include="hdr.vert" />
     <None Include="lighting.frag" />
     <None Include="lighting.vert" />
+    <None Include="light_box.frag" />
     <None Include="normal_mapping.frag" />
     <None Include="normal_mapping.vert" />
     <None Include="parallax_mapping.frag" />
