@@ -377,6 +377,10 @@ int main()
 			const float quadratic = 1.8f;
 			shaderLightingPass.setFloat(("lights[" + std::to_string(i) + "].Linear").c_str(), linear);
 			shaderLightingPass.setFloat(("lights[" + std::to_string(i) + "].Quadratic").c_str(), quadratic);
+			// then calculate radius of light volume/sphere
+			const float maxBrightness = std::fmaxf(std::fmaxf(lightColors[i].r, lightColors[i].g), lightColors[i].b);
+			float radius = (-linear + std::sqrt(linear * linear - 4 * quadratic * (constant - (256.0f / 5.0f) * maxBrightness))) / (2.0f * quadratic);
+			shaderLightingPass.setFloat(("lights[" + std::to_string(i) + "].Radius").c_str(), radius);
 		}
 		shaderLightingPass.setVector3fv("viewPos", camera.getPos());
 		// finally render quad
