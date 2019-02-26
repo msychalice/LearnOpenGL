@@ -143,6 +143,14 @@
     <None Include="blur.vert" />
     <None Include="debug_depth_quad.frag" />
     <None Include="debug_depth_quad.vert" />
+    <None Include="deferred_light_box.frag" />
+    <None Include="deferred_light_box.vert" />
+    <None Include="deferred_shading.frag" />
+    <None Include="deferred_shading.vert" />
+    <None Include="fbo_debug.frag" />
+    <None Include="fbo_debug.vert" />
+    <None Include="g_buffer.frag" />
+    <None Include="g_buffer.vert" />
     <None Include="hdr.frag" />
     <None Include="hdr.vert" />
     <None Include="lighting.frag" />
